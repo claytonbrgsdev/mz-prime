@@ -1,0 +1,406 @@
+{
+    "modelName": "Jet Ski",
+    "detectedMaterials": {
+      "logo": "Logo",
+      "capa": "CAPA",
+      "linha": "LINHA"
+    },
+    "materials": [
+      {
+        "name": "Logo",
+        "type": "MeshStandardMaterial",
+        "uuid": "2356c1e9-b452-4d66-8f33-6108430cf84f",
+        "meshes": [
+          {
+            "name": "DIREITA",
+            "uuid": "1445d248-6c13-4226-81f4-872eb9b160d5",
+            "geometryUuid": "baf95d97-236c-4a3d-b4ed-e7504eeaae4a",
+            "vertexCount": 296,
+            "faceCount": 98,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -3.1307599544525146,
+                "y": 2.3506484031677246,
+                "z": 0.8581563830375671
+              },
+              "max": {
+                "x": -0.2514927089214325,
+                "y": 4.373265266418457,
+                "z": 3.357868194580078
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "b1764ffb-b16f-4640-8f22-bef3eac32846"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0,
+              "roughness": 0.5185185074806213,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "DIREITA"
+            },
+            "originalMaterialUuid": "2356c1e9-b452-4d66-8f33-6108430cf84f"
+          },
+          {
+            "name": "FRENTE",
+            "uuid": "769333fc-0d1a-47b5-bcec-6e378e070a45",
+            "geometryUuid": "cbc741a3-a862-479d-847a-d11ce97812f4",
+            "vertexCount": 551,
+            "faceCount": 183,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": 3.35500168800354,
+                "y": 4.318950176239014,
+                "z": -1.5063261985778809
+              },
+              "max": {
+                "x": 6.333633899688721,
+                "y": 6.09633207321167,
+                "z": 1.5063261985778809
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "b1764ffb-b16f-4640-8f22-bef3eac32846"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0,
+              "roughness": 0.5185185074806213,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "FRENTE"
+            },
+            "originalMaterialUuid": "2356c1e9-b452-4d66-8f33-6108430cf84f"
+          },
+          {
+            "name": "ESQUERDA",
+            "uuid": "8077ffb2-cd86-4291-903d-35ab84ea7378",
+            "geometryUuid": "488660aa-51bc-4a27-94bd-b347de561d0f",
+            "vertexCount": 296,
+            "faceCount": 98,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -3.1307599544525146,
+                "y": 2.3512537479400635,
+                "z": -3.357307195663452
+              },
+              "max": {
+                "x": -0.2514927089214325,
+                "y": 4.373155117034912,
+                "z": -0.8529106974601746
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "b1764ffb-b16f-4640-8f22-bef3eac32846"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0,
+              "roughness": 0.5185185074806213,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "ESQUERDA"
+            },
+            "originalMaterialUuid": "2356c1e9-b452-4d66-8f33-6108430cf84f"
+          }
+        ]
+      },
+      {
+        "name": "Material.001",
+        "type": "MeshStandardMaterial",
+        "uuid": "083b2361-4aba-430d-9f8e-a43cb0724d69",
+        "meshes": [
+          {
+            "name": "FINAL_jetski042",
+            "uuid": "c370dc50-867c-45ef-a796-5aac157eef49",
+            "geometryUuid": "83444b58-db37-41fc-bfdf-143b53b16f6e",
+            "vertexCount": 511,
+            "faceCount": 170,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -11.309642791748047,
+                "y": -4.133756637573242,
+                "z": -1.174871802330017
+              },
+              "max": {
+                "x": 10.589760780334473,
+                "y": 4.133756637573242,
+                "z": 1.2241230010986328
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "bake_baseJETSKI",
+                "uuid": "7a5cef64-5ce4-4c39-afb1-22a5d10b7574"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0,
+              "roughness": 0.2222222238779068,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {},
+            "originalMaterialUuid": "083b2361-4aba-430d-9f8e-a43cb0724d69"
+          }
+        ]
+      },
+      {
+        "name": "Material.003",
+        "type": "MeshStandardMaterial",
+        "uuid": "c3dfe6df-d1cd-4f66-89ff-a77d0f5cd31c",
+        "meshes": [
+          {
+            "name": "FINAL_jetski042_1",
+            "uuid": "46a07576-86dc-445c-8b72-376cc3ccbb51",
+            "geometryUuid": "3544ac4f-8832-4265-8f42-df421b18112a",
+            "vertexCount": 53,
+            "faceCount": 17,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -10.119511604309082,
+                "y": 3.0811970233917236,
+                "z": -0.602088987827301
+              },
+              "max": {
+                "x": -5.300765037536621,
+                "y": 3.433029890060425,
+                "z": 0.13145099580287933
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#464847",
+              "metalness": 0,
+              "roughness": 0.1388888955116272,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {},
+            "originalMaterialUuid": "c3dfe6df-d1cd-4f66-89ff-a77d0f5cd31c"
+          }
+        ]
+      },
+      {
+        "name": "Material",
+        "type": "MeshStandardMaterial",
+        "uuid": "1bd7046d-6014-43e5-a9b0-dbdd10248830",
+        "meshes": [
+          {
+            "name": "FINAL_jetski042_2",
+            "uuid": "91247528-1463-4cbe-9a93-0e5bb9481ab8",
+            "geometryUuid": "89fe672c-4859-4ea2-8432-2facfc2b4ef0",
+            "vertexCount": 1348,
+            "faceCount": 449,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -11.674188613891602,
+                "y": -1.4770779609680176,
+                "z": -1.240906000137329
+              },
+              "max": {
+                "x": -5.300765037536621,
+                "y": 3.433029890060425,
+                "z": 0.721563994884491
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "JETHD",
+                "uuid": "c83ea257-3226-4e48-a72c-e30c889da580"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0,
+              "roughness": 0.5185185074806213,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {},
+            "originalMaterialUuid": "1bd7046d-6014-43e5-a9b0-dbdd10248830"
+          }
+        ]
+      },
+      {
+        "name": "Material.002",
+        "type": "MeshStandardMaterial",
+        "uuid": "b01df49e-5472-428a-92d4-a43d080eb6b3",
+        "meshes": [
+          {
+            "name": "FINAL_jetski042_3",
+            "uuid": "42ca22cc-9f70-4dac-96c7-6f8b9354666e",
+            "geometryUuid": "afca9f0b-7ef1-4c44-85cc-722c0492d86a",
+            "vertexCount": 955,
+            "faceCount": 318,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -11.674188613891602,
+                "y": -1.4770779609680176,
+                "z": -1.240906000137329
+              },
+              "max": {
+                "x": -9.351327896118164,
+                "y": 1.4770779609680176,
+                "z": 0.721563994884491
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#6e6e6e",
+              "metalness": 0.7129629850387573,
+              "roughness": 0.20370370149612427,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {},
+            "originalMaterialUuid": "b01df49e-5472-428a-92d4-a43d080eb6b3"
+          }
+        ]
+      },
+      {
+        "name": "CAPA",
+        "type": "MeshStandardMaterial",
+        "uuid": "d5e8ea1e-4b1c-4257-a288-8e58912f53c7",
+        "meshes": [
+          {
+            "name": "CAPA",
+            "uuid": "2034b183-f5f6-4c17-9fdf-b41bc652ce6f",
+            "geometryUuid": "a0e5be38-d510-49a7-a9d5-eb2b521815a5",
+            "vertexCount": 19402,
+            "faceCount": 6467,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -11.759849548339844,
+                "y": 0.1555408537387848,
+                "z": -4.320518493652344
+              },
+              "max": {
+                "x": 11.015892028808594,
+                "y": 6.328390121459961,
+                "z": 4.325026512145996
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#c4a21b",
+              "metalness": 0.40740740299224854,
+              "roughness": 0.8888888955116272,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "CAPA"
+            },
+            "originalMaterialUuid": "d5e8ea1e-4b1c-4257-a288-8e58912f53c7"
+          }
+        ]
+      },
+      {
+        "name": "LINHA",
+        "type": "MeshStandardMaterial",
+        "uuid": "d177f710-69c9-44b3-84aa-21c1224e0363",
+        "meshes": [
+          {
+            "name": "LINHA002",
+            "uuid": "feb207e0-0b21-4ba1-9cfb-07efb2b04f17",
+            "geometryUuid": "35444b52-ebad-49ab-812c-599823ff5ea1",
+            "vertexCount": 5200,
+            "faceCount": 1733,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -11.32099437713623,
+                "y": 0.33286237716674805,
+                "z": -3.121779680252075
+              },
+              "max": {
+                "x": 10.830083847045898,
+                "y": 5.4394426345825195,
+                "z": 3.121779680252075
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#c4a21b",
+              "metalness": 0,
+              "roughness": 0.5,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "LINHA.002"
+            },
+            "originalMaterialUuid": "d177f710-69c9-44b3-84aa-21c1224e0363"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "totalMaterials": 7,
+      "totalMeshes": 9,
+      "totalVertices": 28612,
+      "totalFaces": 9533
+    }
+  }

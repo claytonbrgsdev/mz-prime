@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>mz-prime</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "https://cdn.jsdelivr.net/npm/three@0.157.0/build/three.module.js",
+          "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.157.0/examples/jsm/"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app">
+      <aside id="sidebar" aria-label="Painel de controles">
+        <h1>Controles</h1>
+        <hr />
+        <section class="control-group">
+          <div class="control">
+            <label>Modelo</label>
+            <div id="modelButtons" class="segmented-row model-grid"></div>
+          </div>
+        </section>
+
+        <section class="control-group">
+          <div class="control">
+            <label>Cor das Linhas</label>
+            <div id="lineColorSwatches" class="swatch-row trio">
+              <button class="swatch-btn" data-hex="#000000" aria-pressed="false" aria-label="Preto" title="Preto" style="--swatch:#000000"></button>
+              <button class="swatch-btn" data-hex="#808080" aria-pressed="false" aria-label="Cinza" title="Cinza" style="--swatch:#808080"></button>
+              <button class="swatch-btn" data-hex="#00A033" aria-pressed="false" aria-label="Verde" title="Verde" style="--swatch:#00A033"></button>
+              <button class="swatch-btn active" data-hex="#0033A0" aria-pressed="true" aria-label="Azul" title="Azul" style="--swatch:#0033A0"></button>
+              <button class="swatch-btn" data-hex="#6600A0" aria-pressed="false" aria-label="Roxo" title="Roxo" style="--swatch:#6600A0"></button>
+              <button class="swatch-btn" data-hex="#A00033" aria-pressed="false" aria-label="Vermelho" title="Vermelho" style="--swatch:#A00033"></button>
+            </div>
+          </div>
+          <div class="control">
+            <label>Cor da Capa</label>
+            <div id="capaColorSwatches" class="swatch-row trio">
+              <button class="swatch-btn" data-hex="#000000" aria-pressed="false" aria-label="Preto" title="Preto" style="--swatch:#000000"></button>
+              <button class="swatch-btn" data-hex="#808080" aria-pressed="false" aria-label="Cinza" title="Cinza" style="--swatch:#808080"></button>
+              <button class="swatch-btn" data-hex="#00A033" aria-pressed="false" aria-label="Verde" title="Verde" style="--swatch:#00A033"></button>
+              <button class="swatch-btn active" data-hex="#0033A0" aria-pressed="true" aria-label="Azul" title="Azul" style="--swatch:#0033A0"></button>
+              <button class="swatch-btn" data-hex="#6600A0" aria-pressed="false" aria-label="Roxo" title="Roxo" style="--swatch:#6600A0"></button>
+              <button class="swatch-btn" data-hex="#A00033" aria-pressed="false" aria-label="Vermelho" title="Vermelho" style="--swatch:#A00033"></button>
+            </div>
+          </div>
+        </section>
+
+        <section class="control-group">
+          <div class="control">
+            <label>Biblioteca de logos</label>
+            <input id="pngUpload" type="file" accept="image/png" multiple />
+            <div id="logoImageList" class="logo-image-list">
+              <p class="logo-image-empty">Nenhuma imagem carregada.</p>
+            </div>
+          </div>
+          <div class="control">
+            <label>Regiões de logo</label>
+            <div id="logoRegions" class="logo-assignment-grid">
+              <p class="logo-image-empty">Nenhuma região carregada.</p>
+            </div>
+          </div>
+        </section>
+
+        
+      </aside>
+
+      <div id="viewport" aria-label="Área 3D"></div>
+    </div>
+
+    <!-- Admin floating panel -->
+    <div id="adminPanel" class="admin-panel" aria-label="Controles administrativos">
+      <details class="admin-shell">
+        <summary>Controles Admin</summary>
+        <div class="admin-content">
+          <section class="control-group">
+            <div class="control">
+              <label>Iluminação (HDR)</label>
+              <select id="hdrSelect"></select>
+            </div>
+            <div class="control">
+              <label>
+                <input id="hdrBackgroundToggle" type="checkbox" /> Mostrar HDR como background
+              </label>
+            </div>
+            <div class="control">
+              <label for="envIntensity">Intensidade do environment</label>
+              <div class="slider-row">
+                <input id="envIntensity" type="range" min="0" max="3" value="1" step="0.1" />
+                <span id="envIntensityValue">1.0</span>
+              </div>
+            </div>
+            <div class="control">
+              <label for="envExposure">Exposição</label>
+              <div class="slider-row">
+                <input id="envExposure" type="range" min="0.1" max="2.5" value="1.0" step="0.05" />
+                <span id="envExposureValue">1.0</span>
+              </div>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <div class="control">
+              <label for="ambientIntensity">Luz ambiente (intensidade)</label>
+              <div class="slider-row">
+                <input id="ambientIntensity" type="range" min="0" max="3" step="0.1" value="0.4" />
+                <span id="ambientIntensityValue">0.4</span>
+              </div>
+            </div>
+            <div class="control">
+              <label>
+                <input id="ambientToggle" type="checkbox" checked /> Habilitar luz ambiente
+              </label>
+            </div>
+            <div class="control">
+              <label for="dirIntensity">Luz direcional (intensidade)</label>
+              <div class="slider-row">
+                <input id="dirIntensity" type="range" min="0" max="3" step="0.1" value="1.0" />
+                <span id="dirIntensityValue">1.0</span>
+              </div>
+            </div>
+            <div class="control">
+              <label>
+                <input id="dirToggle" type="checkbox" checked /> Habilitar luz direcional
+              </label>
+            </div>
+          </section>
+
+          <section class="control-group">
+            <div class="control">
+              <label>
+                <input id="scenarioToggle" type="checkbox" /> Ativar cenário (white-room)
+              </label>
+            </div>
+          </section>
+        </div>
+      </details>
+    </div>
+
+    <script type="module" src="main.js"></script>
+  </body>
+</html>

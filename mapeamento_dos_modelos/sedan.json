@@ -1,0 +1,24 @@
+{
+  "modelName": "Sedan",
+  "detectedMaterials": {
+    "logo": "LOGO1",
+    "capa": "CAPA",
+    "linha": "LINHA002"
+  },
+  "materials": [
+    {
+      "name": "LOGO1",
+      "type": "MeshStandardMaterial",
+      "uuid": "",
+      "meshes": [
+        { "name": "TRAS2", "uuid": "" },
+        { "name": "TRAS1", "uuid": "" },
+        { "name": "FRENTE1", "uuid": "" },
+        { "name": "FRENTE2", "uuid": "" },
+        { "name": "FRENTE3", "uuid": "" },
+        { "name": "ESQUERDA", "uuid": "" },
+        { "name": "DIREITA", "uuid": "" }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "modelName": "Moto G",
+  "detectedMaterials": {
+    "logo": "LOGO1",
+    "capa": "CAPA",
+    "linha": "LINHA"
+  },
+  "materials": [
+    {
+      "name": "LOGO1",
+      "type": "MeshStandardMaterial",
+      "uuid": "",
+      "meshes": [
+        { "name": "FRENTE", "uuid": "" },
+        { "name": "DIREITA", "uuid": "" },
+        { "name": "ESQUERDA", "uuid": "" }
+      ]
+    }
+  ]
+}
+

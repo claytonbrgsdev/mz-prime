@@ -1,0 +1,15 @@
+[
+  { "id": "fusca", "name": "Fusca", "url": "assets/modelos/fusca.glb" },
+  { "id": "jetski", "name": "Jetski", "url": "assets/modelos/jetski.glb" },
+  { "id": "esportivo", "name": "Esportivo", "url": "assets/modelos/esportivo.glb" },
+  { "id": "hatch", "name": "Hatch", "url": "assets/modelos/hatch.glb" },
+  { "id": "bike", "name": "Bike", "url": "assets/modelos/bike.glb" },
+  { "id": "suv", "name": "SUV", "url": "assets/modelos/suv.glb" },
+  { "id": "jeep", "name": "Jeep", "url": "assets/modelos/jeep.glb" },
+  { "id": "kombi", "name": "Kombi", "url": "assets/modelos/kombi.glb" },
+  { "id": "caminhonete", "name": "Caminhonete", "url": "assets/modelos/caminhonete.glb" },
+  { "id": "quadriciclo", "name": "Quadriciclo", "url": "assets/modelos/quadriciclo.glb" },
+  { "id": "ford1929", "name": "Ford 1929", "url": "assets/modelos/ford1929.glb" }
+  ,{ "id": "motoG", "name": "Moto G", "url": "assets/modelos/motoG.glb" }
+  ,{ "id": "sedan", "name": "Sedan", "url": "assets/modelos/sedan.glb" }
+]

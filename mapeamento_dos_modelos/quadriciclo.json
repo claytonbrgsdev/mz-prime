@@ -1,0 +1,321 @@
+{
+    "modelName": "Quadriciclo",
+    "detectedMaterials": {
+      "logo": "LOGO1",
+      "capa": "CAPA",
+      "linha": "Material.002"
+    },
+    "materials": [
+      {
+        "name": "1",
+        "type": "MeshPhysicalMaterial",
+        "uuid": "d14ffade-f78b-4665-a6f7-00680a932788",
+        "meshes": [
+          {
+            "name": "RODA",
+            "uuid": "7fd69307-4d0f-4209-bd04-a0707c345d47",
+            "geometryUuid": "83f5fd86-f241-4804-9b51-4c4fbd8ede15",
+            "vertexCount": 871,
+            "faceCount": 290,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -1.5291999578475952,
+                "y": -2.1851799488067627,
+                "z": -0.5580899715423584
+              },
+              "max": {
+                "x": 1.5286400318145752,
+                "y": 2.056989908218384,
+                "z": 0.2144699990749359
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#262624",
+              "metalness": 0,
+              "roughness": 0.16070200502872467,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "RODA"
+            },
+            "originalMaterialUuid": "d14ffade-f78b-4665-a6f7-00680a932788"
+          }
+        ]
+      },
+      {
+        "name": "CAPA",
+        "type": "MeshStandardMaterial",
+        "uuid": "23546a2d-5a45-4868-9237-9b8c945ea3ae",
+        "meshes": [
+          {
+            "name": "CAPA",
+            "uuid": "c16e23c4-1145-44ef-be51-4dd4a5f797e8",
+            "geometryUuid": "dbe67737-d625-43c9-801f-6d1e866a4594",
+            "vertexCount": 125256,
+            "faceCount": 41752,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -1.5675697326660156,
+                "y": 0.1586090624332428,
+                "z": -2.191786289215088
+              },
+              "max": {
+                "x": 1.5675698518753052,
+                "y": 2.785814046859741,
+                "z": 2.1701741218566895
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "bake_quad",
+                "uuid": "38d99f87-6636-451b-ad46-de8b93417659"
+              }
+            },
+            "materialProperties": {
+              "color": "#c4a21b",
+              "metalness": 0.4000000059604645,
+              "roughness": 0.800000011920929,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "CAPA"
+            },
+            "originalMaterialUuid": "23546a2d-5a45-4868-9237-9b8c945ea3ae"
+          }
+        ]
+      },
+      {
+        "name": "LOGO1",
+        "type": "MeshStandardMaterial",
+        "uuid": "0c7d787d-2ff6-4e53-8e3f-7ac9912e1bd2",
+        "meshes": [
+          {
+            "name": "TRAS",
+            "uuid": "d3f81571-33c1-4f48-a847-2fcd66cde936",
+            "geometryUuid": "18d89986-af67-4cc5-b771-e3bf31f1c1e3",
+            "vertexCount": 1299,
+            "faceCount": 433,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -0.4093532860279083,
+                "y": 0.954819917678833,
+                "z": -2.0826709270477295
+              },
+              "max": {
+                "x": 0.4093532860279083,
+                "y": 1.7735264301300049,
+                "z": -1.9891302585601807
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "66ae145a-e72a-4f47-ba25-9ee08a4a74e2"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0.2500000298023224,
+              "roughness": 0.8425925970077515,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "TRAS"
+            },
+            "originalMaterialUuid": "0c7d787d-2ff6-4e53-8e3f-7ac9912e1bd2"
+          },
+          {
+            "name": "FRENTE",
+            "uuid": "0086441b-2ba2-41df-92c2-48ad015d2df3",
+            "geometryUuid": "879d2f98-5451-45d1-bae0-26545a93dc28",
+            "vertexCount": 2238,
+            "faceCount": 746,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -0.40935325622558594,
+                "y": 0.954819917678833,
+                "z": 2.065244436264038
+              },
+              "max": {
+                "x": 0.40935325622558594,
+                "y": 1.7735264301300049,
+                "z": 2.1701741218566895
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "66ae145a-e72a-4f47-ba25-9ee08a4a74e2"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0.2500000298023224,
+              "roughness": 0.8425925970077515,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "FRENTE"
+            },
+            "originalMaterialUuid": "0c7d787d-2ff6-4e53-8e3f-7ac9912e1bd2"
+          },
+          {
+            "name": "ESQUERDA",
+            "uuid": "d56c7135-72da-4aff-83ef-112b6be11161",
+            "geometryUuid": "3632b167-858f-458d-8baf-2a2c31bc84b8",
+            "vertexCount": 1010,
+            "faceCount": 336,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": 1.1697988510131836,
+                "y": 0.6752762794494629,
+                "z": -0.29586946964263916
+              },
+              "max": {
+                "x": 1.41796875,
+                "y": 1.4939827919006348,
+                "z": 0.5228370428085327
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "66ae145a-e72a-4f47-ba25-9ee08a4a74e2"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0.2500000298023224,
+              "roughness": 0.8425925970077515,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "ESQUERDA"
+            },
+            "originalMaterialUuid": "0c7d787d-2ff6-4e53-8e3f-7ac9912e1bd2"
+          },
+          {
+            "name": "DIREITA",
+            "uuid": "00b993ca-ef30-4fd3-a91e-1b2c0f4291f7",
+            "geometryUuid": "795440a8-2eab-4787-b86e-12335edb991b",
+            "vertexCount": 1010,
+            "faceCount": 336,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -1.4179686307907104,
+                "y": 0.6752762794494629,
+                "z": -0.29586946964263916
+              },
+              "max": {
+                "x": -1.1697989702224731,
+                "y": 1.4939827919006348,
+                "z": 0.5228370428085327
+              }
+            },
+            "textures": {
+              "map": {
+                "name": "transparaeteasa",
+                "uuid": "66ae145a-e72a-4f47-ba25-9ee08a4a74e2"
+              }
+            },
+            "materialProperties": {
+              "color": "#ffffff",
+              "metalness": 0.2500000298023224,
+              "roughness": 0.8425925970077515,
+              "opacity": 1,
+              "transparent": true,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "DIREITA"
+            },
+            "originalMaterialUuid": "0c7d787d-2ff6-4e53-8e3f-7ac9912e1bd2"
+          }
+        ]
+      },
+      {
+        "name": "Material.002",
+        "type": "MeshStandardMaterial",
+        "uuid": "19a6b1e4-7bf9-450e-9a45-e307ce14ad6e",
+        "meshes": [
+          {
+            "name": "LINHA",
+            "uuid": "534615ca-ccba-4724-a68c-37bd9bff8454",
+            "geometryUuid": "cb91e9ce-99a0-4898-9172-5a7e33f475fc",
+            "vertexCount": 17360,
+            "faceCount": 5786,
+            "hasUVs": true,
+            "uvChannels": 1,
+            "boundingBox": {
+              "min": {
+                "x": -1.2887754440307617,
+                "y": 0.1593654602766037,
+                "z": -2.191765069961548
+              },
+              "max": {
+                "x": 1.2887754440307617,
+                "y": 2.7166311740875244,
+                "z": 2.1380093097686768
+              }
+            },
+            "textures": {},
+            "materialProperties": {
+              "color": "#c4a21b",
+              "metalness": 0.2500000298023224,
+              "roughness": 0.8425925970077515,
+              "opacity": 1,
+              "transparent": false,
+              "side": "DoubleSide",
+              "emissive": "#000000",
+              "emissiveIntensity": 1
+            },
+            "userData": {
+              "name": "LINHA"
+            },
+            "originalMaterialUuid": "19a6b1e4-7bf9-450e-9a45-e307ce14ad6e"
+          }
+        ]
+      }
+    ],
+    "summary": {
+      "totalMaterials": 4,
+      "totalMeshes": 7,
+      "totalVertices": 149044,
+      "totalFaces": 49679
+    }
+  }
