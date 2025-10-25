@@ -176,4 +176,23 @@ body {
   max-height: 60vh;
   overflow: auto;
 }
+
+/* Buttons */
+.btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--fg);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:hover { border-color: #c7cdd4; }
+.btn:active { transform: translateY(0.5px); }
+
+/* File upload nicer */
+.file-input-hidden { position: absolute; left: -9999px; }
+.file-row { display: flex; align-items: center; gap: 10px; margin: 8px 0 12px; }
+.muted { color: var(--muted); font-size: 12px; }
   

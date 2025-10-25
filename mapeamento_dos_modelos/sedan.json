@@ -1,13 +1,13 @@
 {
   "modelName": "Sedan",
   "detectedMaterials": {
-    "logo": "LOGO1",
+    "logo": "LOGO2",
     "capa": "CAPA",
     "linha": "LINHA002"
   },
   "materials": [
     {
-      "name": "LOGO1",
+      "name": "LOGO2",
       "type": "MeshStandardMaterial",
       "uuid": "",
       "meshes": [

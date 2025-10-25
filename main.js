@@ -31,6 +31,13 @@ scene.add(dirLight);
 // Re-enable essential OrbitControls (no special camera presets)
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
+controls.enablePan = false;
+// Limit vertical orbit: allow roughly from near-horizon (0°) up to ~75° above
+controls.minPolarAngle = THREE.MathUtils.degToRad(15); // avoid perfect top-down
+controls.maxPolarAngle = THREE.MathUtils.degToRad(90); // do not go below the car
+// Auto-rotate (enabled by default, slightly faster)
+controls.autoRotate = true;
+controls.autoRotateSpeed = 0.6; // gentle orbit speed
 
 function resize() {
   const rect = viewport.getBoundingClientRect();
@@ -81,6 +88,16 @@ const CATEGORY_TARGET_RATIO = { // target length as fraction of scenario referen
   medium: 0.30,
   large: 0.36,
   xlarge: 0.42,
+};
+
+// Swatch config (shader parameters for CAPA map-based materials)
+const SWATCH_CONFIG = {
+  '#962d28': { sat: 2.00, val: 0.00, hue: 55,  mix: 1.00 }, // vermelho (ajuste fino do screenshot)
+  '#498551': { sat: 1.60, val: 1.00, hue: 87,  mix: 0.63 }, // verde
+  '#2c41bd': { sat: 2.00, val: 1.76, hue: 34,  mix: 0.86 }, // azul royal (ajuste fino do screenshot)
+  '#001f5b': { sat: 0.23, val: 0.00, hue: 34,  mix: 0.33 }, // azul marinho (ajuste fino do screenshot)
+  '#615e60': { sat: 0.0,  val: 1.0,  hue: 0,   mix: 0.0  }, // cinza
+  '#090909': { sat: 0.0,  val: 0.15, hue: 0,   mix: 0.0  }, // preto
 };
 
 // Scenario state
@@ -160,6 +177,8 @@ async function populateModels() {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     /** @type {{id:string,name:string,url:string}[]} */
     const models = await res.json();
+    // Ordena alfabeticamente por nome (pt-BR)
+    models.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id, 'pt-BR'));
     modelButtons.innerHTML = '';
     for (const m of models) {
       const btn = document.createElement('button');
@@ -170,8 +189,11 @@ async function populateModels() {
       btn.setAttribute('aria-pressed', 'false');
       modelButtons.appendChild(btn);
     }
-    const first = modelButtons.querySelector('button');
-    if (first) first.click();
+    // Seleciona Esportivo por padrão; se não existir, cai no primeiro
+    const preferred = Array.from(modelButtons.querySelectorAll('button'))
+      .find((b) => (b.dataset.id || '').toLowerCase() === 'esportivo');
+    const toClick = preferred || modelButtons.querySelector('button');
+    if (toClick) toClick.click();
   } catch (err) {
     console.warn('Falha ao carregar manifest de modelos:', err);
   }
@@ -273,8 +295,7 @@ async function setupMappingAndUI(modelId) {
     }
   });
 
-  // 3.1) Initialize CAPA/LINHA base color only for materials without map hueShift
-  if (colorInitUuids.size) applyDirectColor(colorInitUuids, STANDARD_INITIAL_COLOR.clone());
+  // 3.1) Do not alter original materials on load; keep model's default bake/colors
 
   // 4) Populate regions UI and wire image upload + selects
   await populateLogoRegions(modelId);
@@ -285,6 +306,10 @@ async function setupMappingAndUI(modelId) {
   // 5) Scale model relative to scenario
   await scaleModelToScenario(currentModel, modelId).catch((e)=>console.warn('Scale model failed:', e));
   await placeModelOnGround(currentModel).catch((e)=>console.warn('Ground placement failed:', e));
+  setControlsTargetToModel(currentModel);
+  setControlsDistanceLimitsForModel(currentModel);
+  setDefaultCameraOrbitForModel(currentModel);
+  // Do not apply any color presets on load; user will choose swatches
 }
 
 // Map swatch hex -> behavior: either rotation (colored) or neutral (set S=0)
@@ -313,30 +338,25 @@ function wireSwatchHandlers() {
 
 function applyColorChoice(groupKey, hex) {
   if (!currentModel || !originalColorMap) return;
-  // Neutral handling
-  if (hex === '#000000' || hex.toLowerCase() === '#000000') {
-    const uuids = groupKey === 'capa' ? capaMaterialUuids : linhaMaterialUuids;
-    applyDirectColor(uuids, new THREE.Color('#000000'));
-    return;
-  }
-  if (hex.toLowerCase() === '#808080') {
-    const uuids = groupKey === 'capa' ? capaMaterialUuids : linhaMaterialUuids;
-    applyDirectColor(uuids, new THREE.Color('#808080'));
-    return;
-  }
+  const hexLc = hex.toLowerCase();
+  const cfg = SWATCH_CONFIG[hexLc] || { sat: 1.0, val: 1.0 };
 
-  // Colored: compute rotation from STANDARD_INITIAL_COLOR to target hex
   const baseHSL = { h: 0, s: 0, l: 0 };
   STANDARD_INITIAL_COLOR.getHSL(baseHSL);
-  const target = new THREE.Color(hex);
+  const target = new THREE.Color(hexLc);
   const targetHSL = { h: 0, s: 0, l: 0 };
   target.getHSL(targetHSL);
   const deltaDeg = (targetHSL.h - baseHSL.h) * 360;
 
   const uuids = groupKey === 'capa' ? capaMaterialUuids : linhaMaterialUuids;
   const rotationMap = new Map();
-  uuids.forEach((u) => rotationMap.set(u, deltaDeg));
-  applyHueRotation(currentModel, rotationMap, originalColorMap);
+  const extraHue = (groupKey === 'capa' ? (cfg.hue || 0) : 0);
+  uuids.forEach((u) => rotationMap.set(u, deltaDeg + extraHue));
+  // Shader-driven materials (map) will use hue+sat+val; others will get color set directly after
+  const targetLinear = target.clone();
+  if (targetLinear.convertSRGBToLinear) targetLinear.convertSRGBToLinear();
+  applyHueRotation(currentModel, rotationMap, originalColorMap, { sat: cfg.sat, val: cfg.val, mix: cfg.mix ?? 0.0, target: targetLinear });
+  applyDirectColor(uuids, target);
 }
 
 function applyDirectColor(uuids, color) {
@@ -345,6 +365,7 @@ function applyDirectColor(uuids, color) {
     const mats = Array.isArray(child.material) ? child.material : [child.material];
     for (const m of mats) {
       if (uuids.has(m.uuid) && m.color) {
+        if (m.userData && m.userData.hueShift) continue;
         m.color.copy(color);
         m.needsUpdate = true;
       }
@@ -386,13 +407,16 @@ function wireImageUploadAndSelections() {
   function refreshImageList() {
     list.innerHTML = '';
     const items = imagePool.list();
+    const status = document.getElementById('pngUploadStatus');
     if (!items.length) {
+      if (status) status.textContent = 'Nenhum arquivo selecionado';
       const p = document.createElement('p');
       p.className = 'logo-image-empty';
       p.textContent = 'Nenhuma imagem carregada.';
       list.appendChild(p);
       return;
     }
+    if (status) status.textContent = `${items.length} imagem(ns) carregada(s)`;
     for (const it of items) {
       const img = document.createElement('img');
       img.src = it.url;
@@ -757,6 +781,82 @@ async function placeModelOnGround(model) {
     model.updateMatrixWorld();
   }
 }
+
+function setControlsTargetToModel(model) {
+  if (!model) return;
+  const box = new THREE.Box3().setFromObject(model);
+  const size = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  // Aim roughly at 40% of the height to feel natural and constrain polar limits properly
+  const targetY = box.min.y + size.y * 0.4;
+  controls.target.set(center.x, targetY, center.z);
+  controls.update();
+}
+
+function setControlsDistanceLimitsForModel(model) {
+  if (!model) return;
+  const box = new THREE.Box3().setFromObject(model);
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const r = Math.max(0.001, sphere.radius);
+  // Choose limits relative to model size
+  const minD = r * 1.20; // afasta o limite de zoom-in
+  const maxD = r * 2.00; // reduz um pouco o zoom-out máximo
+  controls.minDistance = minD;
+  controls.maxDistance = maxD;
+  // Clamp current distance to the new range
+  const toCam = new THREE.Vector3().subVectors(camera.position, controls.target);
+  let dist = toCam.length();
+  if (!isFinite(dist) || dist === 0) dist = maxD;
+  const clamped = THREE.MathUtils.clamp(dist, minD, maxD);
+  toCam.setLength(clamped);
+  camera.position.copy(controls.target).add(toCam);
+  camera.updateProjectionMatrix();
+  controls.update();
+}
+
+function setDefaultCameraOrbitForModel(model) {
+  if (!model) return;
+  const box = new THREE.Box3().setFromObject(model);
+  const sphere = box.getBoundingSphere(new THREE.Sphere());
+  const r = Math.max(0.001, sphere.radius);
+  // Choose a pleasant diagonal view
+  const polar = THREE.MathUtils.degToRad(50);   // tilt down ~50°
+  const azim  = THREE.MathUtils.degToRad(-35);  // rotate around target ~-35°
+  // Use mid distance inside limits
+  const minD = controls.minDistance || r * 1.2;
+  const maxD = controls.maxDistance || r * 2.0;
+  const d = THREE.MathUtils.clamp(r * 1.6, minD, maxD);
+  // Convert spherical to Cartesian offset (Y is up)
+  const sinP = Math.sin(polar);
+  const offset = new THREE.Vector3(
+    d * sinP * Math.cos(azim),
+    d * Math.cos(polar),
+    d * sinP * Math.sin(azim)
+  );
+  camera.position.copy(controls.target).add(offset);
+  camera.lookAt(controls.target);
+  camera.updateProjectionMatrix();
+  controls.update();
+}
+
+// ---------- Auto-rotate wiring ----------
+function wireAutoRotate() {
+  const btn = document.getElementById('toggleAutoRotateBtn');
+  if (!btn) return;
+  const apply = (enabled) => {
+    controls.autoRotate = !!enabled;
+    btn.setAttribute('aria-pressed', String(!!enabled));
+    btn.textContent = enabled ? 'Parar rotação' : 'Girar câmera';
+  };
+  // initialize state from current controls
+  apply(controls.autoRotate);
+  btn.addEventListener('click', () => {
+    apply(!controls.autoRotate);
+  });
+}
+wireAutoRotate();
+
+// (Removed) shader fine‑tune UI; presets from SWATCH_CONFIG are applied directly.
 
 // Expose small API for manual testing in console
 window.MZPrime = {
