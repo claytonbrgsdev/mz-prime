@@ -15,8 +15,11 @@ scene.background = new THREE.Color(0xffffff);
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 camera.position.z = 5;
 
-const renderer = new THREE.WebGLRenderer({ antialias: true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+const renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+// Adaptive pixel ratio for smoother performance
+const PR_MIN = 1.0, PR_MAX = Math.min(1.5, window.devicePixelRatio || 1.5);
+let currentPR = PR_MAX;
+renderer.setPixelRatio(currentPR);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 viewport.appendChild(renderer.domElement);
@@ -55,6 +58,64 @@ if ('ResizeObserver' in window) {
   ro.observe(viewport);
 }
 resize();
+// Render-on-demand loop with optional continuous animation
+let animating = false;
+let rafId = null;
+let lastT = 0;
+let smoothedDt = 16.7;
+let renderScheduled = false;
+
+function adaptPixelRatio(dt) {
+  // Exponential moving average of frame time
+  smoothedDt = smoothedDt * 0.9 + dt * 0.1;
+  // If too slow, reduce pixel ratio; if fast, increase, within bounds
+  if (smoothedDt > 24 && currentPR > PR_MIN) {
+    currentPR = Math.max(PR_MIN, currentPR - 0.25);
+    renderer.setPixelRatio(currentPR);
+  } else if (smoothedDt < 17 && currentPR < PR_MAX) {
+    currentPR = Math.min(PR_MAX, currentPR + 0.25);
+    renderer.setPixelRatio(currentPR);
+  }
+}
+
+function loop(t) {
+  if (!animating) { rafId = null; return; }
+  const dt = lastT ? (t - lastT) : 16.7; lastT = t;
+  adaptPixelRatio(dt);
+  controls.update();
+  renderer.render(scene, camera);
+  rafId = requestAnimationFrame(loop);
+}
+
+function startLoop() {
+  if (animating) return;
+  animating = true; lastT = 0;
+  rafId = requestAnimationFrame(loop);
+}
+
+function stopLoop() {
+  animating = false;
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+
+function requestRender() {
+  if (animating) return;
+  if (renderScheduled) return;
+  renderScheduled = true;
+  requestAnimationFrame(() => {
+    renderScheduled = false;
+    renderer.render(scene, camera);
+  });
+}
+
+controls.addEventListener('change', () => { if (!animating) requestRender(); });
+controls.addEventListener('start', () => startLoop());
+controls.addEventListener('end', () => { if (!controls.autoRotate) setTimeout(() => stopLoop(), 120); });
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) stopLoop();
+  else { if (controls.autoRotate) startLoop(); requestRender(); }
+});
 
 // GLB loading state
 let currentModel = null;
@@ -357,6 +418,7 @@ function applyColorChoice(groupKey, hex) {
   if (targetLinear.convertSRGBToLinear) targetLinear.convertSRGBToLinear();
   applyHueRotation(currentModel, rotationMap, originalColorMap, { sat: cfg.sat, val: cfg.val, mix: cfg.mix ?? 0.0, target: targetLinear });
   applyDirectColor(uuids, target);
+  requestRender();
 }
 
 function applyDirectColor(uuids, color) {
@@ -408,7 +470,7 @@ function wireImageUploadAndSelections() {
     list.innerHTML = '';
     const items = imagePool.list();
     const status = document.getElementById('pngUploadStatus');
-    if (!items.length) {
+  if (!items.length) {
       if (status) status.textContent = 'Nenhum arquivo selecionado';
       const p = document.createElement('p');
       p.className = 'logo-image-empty';
@@ -417,6 +479,7 @@ function wireImageUploadAndSelections() {
       return;
     }
     if (status) status.textContent = `${items.length} imagem(ns) carregada(s)`;
+    requestRender();
     for (const it of items) {
       const img = document.createElement('img');
       img.src = it.url;
@@ -455,6 +518,7 @@ function wireImageUploadAndSelections() {
     refreshImageList();
     refreshRegionOptions();
     input.value = '';
+    requestRender();
   };
 
   // Assign texture when user picks an image for a region
@@ -463,7 +527,7 @@ function wireImageUploadAndSelections() {
     if (!sel) return;
     const meshName = sel.dataset.meshName;
     const imageId = sel.value || null;
-    applyRegionAssignment(meshName, imageId).catch((err) => console.warn('Falha ao aplicar logo:', err));
+    applyRegionAssignment(meshName, imageId).then(() => requestRender()).catch((err) => console.warn('Falha ao aplicar logo:', err));
   });
 
   refreshImageList();
@@ -618,20 +682,24 @@ function wireHdrControls() {
   const expoVal = document.getElementById('envExposureValue');
   if (!sel || !bg || !inten || !expo) return;
   sel.addEventListener('change', () => loadHDR(sel.value));
+  sel.addEventListener('change', () => requestRender());
   bg.addEventListener('change', () => {
     envBackground = bg.checked;
     if (envBackground) scene.background = currentEnv.srcTex || null;
     else scene.background = null;
+    requestRender();
   });
   inten.addEventListener('input', () => {
     envIntensity = parseFloat(inten.value);
     intenVal.textContent = envIntensity.toFixed(1);
     applyEnvToMaterials();
+    requestRender();
   });
   expo.addEventListener('input', () => {
     envExposure = parseFloat(expo.value);
     expoVal.textContent = envExposure.toFixed(2);
     applyEnvToMaterials();
+    requestRender();
   });
 }
 
@@ -852,6 +920,7 @@ function wireAutoRotate() {
   apply(controls.autoRotate);
   btn.addEventListener('click', () => {
     apply(!controls.autoRotate);
+    if (controls.autoRotate) startLoop(); else stopLoop();
   });
 }
 wireAutoRotate();
@@ -872,9 +941,5 @@ window.MZPrime = {
   applyColorChoice: (group, hex) => applyColorChoice(group, hex),
 };
 
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
-animate();
+// Start loop if autoRotate; otherwise render once
+if (controls.autoRotate) startLoop(); else requestRender();
