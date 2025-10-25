@@ -35,9 +35,9 @@ scene.add(dirLight);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-// Limit vertical orbit: allow roughly from near-horizon (0°) up to ~75° above
-controls.minPolarAngle = THREE.MathUtils.degToRad(15); // avoid perfect top-down
-controls.maxPolarAngle = THREE.MathUtils.degToRad(90); // do not go below the car
+// Limit vertical orbit ainda mais restrito (não ver teto, nem por baixo)
+controls.minPolarAngle = THREE.MathUtils.degToRad(55); // limita subida (~55° acima do alvo)
+controls.maxPolarAngle = THREE.MathUtils.degToRad(90); // não permite olhar por baixo
 // Auto-rotate (enabled by default, slightly faster)
 controls.autoRotate = true;
 controls.autoRotateSpeed = 0.6; // gentle orbit speed
@@ -154,7 +154,8 @@ const CATEGORY_TARGET_RATIO = { // target length as fraction of scenario referen
 // Swatch config (shader parameters for CAPA map-based materials)
 const SWATCH_CONFIG = {
   '#962d28': { sat: 2.00, val: 0.00, hue: 55,  mix: 1.00 }, // vermelho (ajuste fino do screenshot)
-  '#498551': { sat: 1.60, val: 1.00, hue: 87,  mix: 0.63 }, // verde
+  // Verde musgo: menos brilho, leve tom terroso
+  '#498551': { sat: 1.20, val: 0.72, hue: 98,  mix: 0.74 }, // verde musgo (ajustado)
   '#2c41bd': { sat: 2.00, val: 1.76, hue: 34,  mix: 0.86 }, // azul royal (ajuste fino do screenshot)
   '#001f5b': { sat: 0.23, val: 0.00, hue: 34,  mix: 0.33 }, // azul marinho (ajuste fino do screenshot)
   '#615e60': { sat: 0.0,  val: 1.0,  hue: 0,   mix: 0.0  }, // cinza
@@ -867,8 +868,8 @@ function setControlsDistanceLimitsForModel(model) {
   const sphere = box.getBoundingSphere(new THREE.Sphere());
   const r = Math.max(0.001, sphere.radius);
   // Choose limits relative to model size
-  const minD = r * 1.20; // afasta o limite de zoom-in
-  const maxD = r * 2.00; // reduz um pouco o zoom-out máximo
+  const minD = r * 1.50; // chega menos perto
+  const maxD = r * 1.70; // e também menos longe
   controls.minDistance = minD;
   controls.maxDistance = maxD;
   // Clamp current distance to the new range
