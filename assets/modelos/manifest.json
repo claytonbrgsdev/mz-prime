@@ -12,4 +12,5 @@
   { "id": "ford1929", "name": "Ford 1929", "url": "assets/modelos/ford1929.glb" }
   ,{ "id": "motoG", "name": "Moto G", "url": "assets/modelos/motoG.glb" }
   ,{ "id": "sedan", "name": "Sedan", "url": "assets/modelos/sedan.glb" }
+  ,{ "id": "sedanteste", "name": "Sedan Teste", "url": "assets/modelos/sedanteste.glb" }
 ]

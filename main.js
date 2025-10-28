@@ -38,9 +38,8 @@ controls.enablePan = false;
 // Limit vertical orbit ainda mais restrito (não ver teto, nem por baixo)
 controls.minPolarAngle = THREE.MathUtils.degToRad(55); // limita subida (~55° acima do alvo)
 controls.maxPolarAngle = THREE.MathUtils.degToRad(90); // não permite olhar por baixo
-// Auto-rotate (enabled by default, slightly faster)
-controls.autoRotate = true;
-controls.autoRotateSpeed = 0.6; // gentle orbit speed
+// Auto-rotate disabled (no automatic camera movement)
+controls.autoRotate = false;
 
 function resize() {
   const rect = viewport.getBoundingClientRect();
@@ -114,7 +113,7 @@ controls.addEventListener('start', () => startLoop());
 controls.addEventListener('end', () => { if (!controls.autoRotate) setTimeout(() => stopLoop(), 120); });
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopLoop();
-  else { if (controls.autoRotate) startLoop(); requestRender(); }
+  else { requestRender(); }
 });
 
 // GLB loading state
@@ -140,7 +139,7 @@ let envAutoLoaded = false;
 // Model scaling categories relative to scenario
 const MODEL_CATEGORY = {
   bike: 'small', motoG: 'small', jetski: 'small', quadriciclo: 'small',
-  fusca: 'medium', esportivo: 'medium', hatch: 'medium', sedan: 'medium', ford1929: 'medium', jeep: 'medium',
+  fusca: 'medium', esportivo: 'medium', hatch: 'medium', sedan: 'medium', sedanteste: 'medium', ford1929: 'medium', jeep: 'medium',
   kombi: 'large',
   caminhonete: 'xlarge', suv: 'xlarge',
 };
@@ -908,23 +907,7 @@ function setDefaultCameraOrbitForModel(model) {
   controls.update();
 }
 
-// ---------- Auto-rotate wiring ----------
-function wireAutoRotate() {
-  const btn = document.getElementById('toggleAutoRotateBtn');
-  if (!btn) return;
-  const apply = (enabled) => {
-    controls.autoRotate = !!enabled;
-    btn.setAttribute('aria-pressed', String(!!enabled));
-    btn.textContent = enabled ? 'Parar rotação' : 'Girar câmera';
-  };
-  // initialize state from current controls
-  apply(controls.autoRotate);
-  btn.addEventListener('click', () => {
-    apply(!controls.autoRotate);
-    if (controls.autoRotate) startLoop(); else stopLoop();
-  });
-}
-wireAutoRotate();
+// (Auto-rotate removed)
 
 // (Removed) shader fine‑tune UI; presets from SWATCH_CONFIG are applied directly.
 
@@ -942,5 +925,5 @@ window.MZPrime = {
   applyColorChoice: (group, hex) => applyColorChoice(group, hex),
 };
 
-// Start loop if autoRotate; otherwise render once
-if (controls.autoRotate) startLoop(); else requestRender();
+// Render once; loop only during user interaction
+requestRender();
