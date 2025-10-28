@@ -613,12 +613,12 @@ async function populateHdrSelect() {
     console.warn('HDR manifest ausente ou inválido');
   }
   // Auto-select and load default HDR once
-  const def = 'assets/imagens/msichll.hdr';
+  const def = 'assets/imagens/simple_studio.hdr';
   if (!envAutoLoaded) {
     const sel = document.getElementById('hdrSelect');
     if (sel) {
       for (let i = 0; i < sel.options.length; i++) {
-        if (sel.options[i].value.endsWith('msichll.hdr')) {
+        if (sel.options[i].value.endsWith('simple_studio.hdr')) {
           sel.value = sel.options[i].value;
           envAutoLoaded = true;
           await loadHDR(sel.value);
