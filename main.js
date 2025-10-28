@@ -139,7 +139,7 @@ let envAutoLoaded = false;
 // Model scaling categories relative to scenario
 const MODEL_CATEGORY = {
   bike: 'small', motoG: 'small', jetski: 'small', quadriciclo: 'small',
-  fusca: 'medium', esportivo: 'medium', hatch: 'medium', sedan: 'medium', sedanteste: 'medium', ford1929: 'medium', jeep: 'medium',
+  fusca: 'medium', esportivo: 'medium', hatch: 'medium', sedan: 'medium', ford1929: 'medium', jeep: 'medium',
   kombi: 'large',
   caminhonete: 'xlarge', suv: 'xlarge',
 };
