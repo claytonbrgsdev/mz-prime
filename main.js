@@ -337,8 +337,8 @@ async function setupMappingAndUI(modelId) {
   wireImageUploadAndSelections();
   wireSwatchHandlers();
   applyEnvToMaterials();
-  await scaleModelToScenario(currentModel, modelId).catch((e)=>console.warn('Scale model failed:', e));
-  await placeModelOnGround(currentModel).catch((e)=>console.warn('Ground placement failed:', e));
+  await scaleModelToScenario(currentModel, modelId).catch((e)=>console.warn('Falha ao escalar modelo:', e));
+  await placeModelOnGround(currentModel).catch((e)=>console.warn('Falha ao posicionar no chão:', e));
   setControlsTargetToModel(currentModel);
   setControlsDistanceLimitsForModel(currentModel);
   setDefaultCameraOrbitForModel(currentModel);
@@ -832,7 +832,7 @@ async function placeModelOnGround(model) {
     model.position.y += deltaY;
     model.updateMatrixWorld(true);
   } else {
-    console.warn('placeModelOnGround: Could not calculate valid deltaY', {
+    console.warn('placeModelOnGround: Não foi possível calcular deltaY válido', {
       groundY,
       newMinY,
       targetBottomY,
@@ -857,7 +857,7 @@ function setControlsDistanceLimitsForModel(model) {
   const box = new THREE.Box3().setFromObject(model);
   const sphere = box.getBoundingSphere(new THREE.Sphere());
   const r = Math.max(0.001, sphere.radius);
-  const minD = r * 1.50;
+  const minD = r * 1.20;
   const maxD = r * 1.70;
   controls.minDistance = minD;
   controls.maxDistance = maxD;
