@@ -1,10 +1,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { loadGLB, disposeObject } from './lib/assetLoader.js';
-import { loadMappingForModelId, indexMapping } from './lib/mappings.js';
-import { ImagePool } from './lib/textures.js';
+import { VehicleCustomization } from './lib/customization.js';
 import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
-import { buildOriginalColorsMap, applyHueRotation, assignTextureToMesh, STANDARD_INITIAL_COLOR, attachHueShift } from './lib/appearance.js';
 
 const viewport = document.getElementById('viewport');
 
@@ -110,16 +108,10 @@ document.addEventListener('visibilitychange', () => {
   else { requestRender(); }
 });
 
-// ---------- ESTADO DE CARREGAMENTO DE MODELOS ----------
+// ---------- CUSTOMIZAÇÃO DE VEÍCULOS ----------
+const vehicleCustomization = new VehicleCustomization(scene, renderer, requestRender);
 let currentModel = null;
-let loadToken = 0;
 let currentModelId = null;
-let mappingIndex = null;
-let originalColorMap = null;
-let capaMaterialUuids = new Set();
-let linhaMaterialUuids = new Set();
-const clonedMeshes = new Set();
-const imagePool = new ImagePool(renderer);
 
 // ---------- ESTADO DE HDR ----------
 const rgbeLoader = new RGBELoader();
@@ -144,62 +136,44 @@ const CATEGORY_TARGET_RATIO = {
   xlarge: 0.24,
 };
 
-// ---------- CONFIGURAÇÃO DE CORES ----------
-const SWATCH_CONFIG = {
-  '#962d28': { sat: 2.00, val: 0.00, hue: 55,  mix: 1.00 },
-  '#498551': { sat: 1.20, val: 0.72, hue: 98,  mix: 0.74 },
-  '#2c41bd': { sat: 2.00, val: 1.76, hue: 34,  mix: 0.86 },
-  '#001f5b': { sat: 0.23, val: 0.00, hue: 34,  mix: 0.33 },
-  '#615e60': { sat: 0.0,  val: 1.0,  hue: 0,   mix: 0.0  },
-  '#090909': { sat: 0.0,  val: 0.15, hue: 0,   mix: 0.0  },
-};
+// (SWATCH_CONFIG movido para customization.js)
 
 // ---------- CENÁRIO ----------
 const SCENARIO_URL = 'assets/cenarios/scifi_stage_gallery_baked_gltf/scene.gltf';
 let scenarioRoot = null;
 
 export async function loadModel(url) {
-  viewport.setAttribute('aria-busy', 'true');
-  const token = ++loadToken;
-  viewport.dataset.busy = 'Carregando… 0%';
-  try {
-    const gltf = await loadGLB(url, (pct) => {
-      viewport.dataset.busy = pct == null ? 'Carregando…' : `Carregando… ${pct}%`;
-    });
-    if (token !== loadToken) {
-      if (gltf?.scene) disposeObject(gltf.scene);
-      return;
-    }
-    const root = gltf.scene || gltf.scenes?.[0];
-    if (!root) throw new Error('GLTF sem cena válida.');
-
-    if (currentModel) {
-      scene.remove(currentModel);
-      disposeObject(currentModel);
-    }
-
-    currentModel = root;
-    scene.add(currentModel);
-    camera.position.set(0, 0, 5);
-    camera.near = 0.1;
-    camera.far = 1000;
-    camera.updateProjectionMatrix();
-  } catch (err) {
-    console.warn('Falha ao carregar modelo:', err);
-  } finally {
-    viewport.removeAttribute('aria-busy');
-    delete viewport.dataset.busy;
-  }
+  // Função mantida para compatibilidade com API pública
+  // O carregamento real agora é feito via VehicleCustomization
+  console.warn('loadModel(url) está deprecated. Use vehicleCustomization.loadModel()');
 }
 
 // ---------- SELEÇÃO DE MODELOS ----------
 const modelButtons = document.getElementById('modelButtons');
 async function selectModel(id, url) {
+  viewport.setAttribute('aria-busy', 'true');
+  viewport.dataset.busy = 'Carregando… 0%';
   try {
-    await loadModel(url);
-  } finally {
-    currentModelId = id;
+    const result = await vehicleCustomization.loadModel(id, url, (pct) => {
+      viewport.dataset.busy = pct == null ? 'Carregando…' : `Carregando… ${pct}%`;
+    });
+    if (!result) return;
+    
+    currentModel = result.model;
+    currentModelId = result.modelId;
+    
+    // Configuração de câmera e posicionamento
+    camera.position.set(0, 0, 5);
+    camera.near = 0.1;
+    camera.far = 1000;
+    camera.updateProjectionMatrix();
+    
     await setupMappingAndUI(id);
+  } catch (err) {
+    console.warn('Falha ao carregar modelo:', err);
+  } finally {
+    viewport.removeAttribute('aria-busy');
+    delete viewport.dataset.busy;
   }
 }
 if (modelButtons) {
@@ -218,26 +192,33 @@ if (modelButtons) {
 }
 
 async function populateModels() {
-  if (!modelButtons) return;
   try {
-    const res = await fetch('assets/modelos/manifest.json');
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const models = await res.json();
-    models.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id, 'pt-BR'));
-    modelButtons.innerHTML = '';
-    for (const m of models) {
-      const btn = document.createElement('button');
-      btn.className = 'seg-btn';
-      btn.textContent = m.name || m.id || 'Modelo';
-      btn.dataset.url = m.url;
-      if (m.id) btn.dataset.id = m.id;
-      btn.setAttribute('aria-pressed', 'false');
-      modelButtons.appendChild(btn);
+    const models = await vehicleCustomization.listAvailableModels();
+    
+    // Se há botões no DOM, popula eles
+    if (modelButtons) {
+      modelButtons.innerHTML = '';
+      for (const m of models) {
+        const btn = document.createElement('button');
+        btn.className = 'seg-btn';
+        btn.textContent = m.name || m.id || 'Modelo';
+        btn.dataset.url = m.url;
+        if (m.id) btn.dataset.id = m.id;
+        btn.setAttribute('aria-pressed', 'false');
+        modelButtons.appendChild(btn);
+      }
+      const preferred = Array.from(modelButtons.querySelectorAll('button'))
+        .find((b) => (b.dataset.id || '').toLowerCase() === 'esportivo');
+      const toClick = preferred || modelButtons.querySelector('button');
+      if (toClick) toClick.click();
+    } else {
+      // Se não há sidebar, carrega modelo padrão automaticamente
+      const preferred = models.find((m) => (m.id || '').toLowerCase() === 'esportivo');
+      const defaultModel = preferred || models[0];
+      if (defaultModel && defaultModel.id && defaultModel.url) {
+        await selectModel(defaultModel.id, defaultModel.url);
+      }
     }
-    const preferred = Array.from(modelButtons.querySelectorAll('button'))
-      .find((b) => (b.dataset.id || '').toLowerCase() === 'esportivo');
-    const toClick = preferred || modelButtons.querySelector('button');
-    if (toClick) toClick.click();
   } catch (err) {
     console.warn('Falha ao carregar manifest de modelos:', err);
   }
@@ -250,27 +231,23 @@ async function populateLogoRegions(modelId) {
   if (!container) return;
   container.innerHTML = '';
   try {
-    const mapping = await loadMappingForModelId(modelId);
-    const idx = indexMapping(mapping);
-    const logoName = idx.detectedMaterials.logo;
-    const logoEntry = idx.byMaterialName.get(logoName);
-    const meshes = logoEntry?.meshes || [];
-    if (!meshes.length) {
+    const regions = vehicleCustomization.getLogoRegions();
+    if (!regions.length) {
       const p = document.createElement('p');
       p.className = 'logo-image-empty';
       p.textContent = 'Nenhuma região carregada.';
       container.appendChild(p);
       return;
     }
-    for (const mesh of meshes) {
+    for (const region of regions) {
       const item = document.createElement('div');
       item.className = 'logo-assignment-item';
       const label = document.createElement('label');
       label.className = 'logo-assignment-label';
-      label.textContent = mesh.name || 'Região';
+      label.textContent = region.name || 'Região';
       const select = document.createElement('select');
       select.className = 'logo-assignment-select';
-      select.dataset.meshName = mesh.name || '';
+      select.dataset.meshName = region.meshName || '';
       const optNone = document.createElement('option');
       optNone.value = '';
       optNone.textContent = '— Nenhuma —';
@@ -289,50 +266,7 @@ async function populateLogoRegions(modelId) {
 
 // ---------- CONFIGURAÇÃO DE MODELO E UI ----------
 async function setupMappingAndUI(modelId) {
-  const mapping = await loadMappingForModelId(modelId);
-  mappingIndex = indexMapping(mapping);
-
-  const names = mappingIndex.detectedMaterials || {};
-  originalColorMap = buildOriginalColorsMap(currentModel, names);
-
-  capaMaterialUuids = new Set();
-  linhaMaterialUuids = new Set();
-  const colorInitUuids = new Set();
-  const isBakeLike = (tex) => {
-    if (!tex) return false;
-    const s = `${tex.name || ''} ${tex?.image?.src || ''}`.toLowerCase();
-    return s.includes('bake') || s.includes('esportivo') || s.includes('esport');
-  };
-  currentModel.traverse((child) => {
-    if (!child.isMesh || !child.material) return;
-    const mats = Array.isArray(child.material) ? child.material : [child.material];
-    for (const m of mats) {
-      if (!m || !m.name) continue;
-      const isCapa = names.capa && m.name === names.capa;
-      const isLinha = names.linha && m.name === names.linha;
-      if (isCapa) {
-        capaMaterialUuids.add(m.uuid);
-        if (m.map) {
-          attachHueShift(m);
-        } else {
-          colorInitUuids.add(m.uuid);
-        }
-      }
-      if (isLinha) {
-        linhaMaterialUuids.add(m.uuid);
-        if (m.map) {
-          attachHueShift(m);
-        } else {
-          colorInitUuids.add(m.uuid);
-        }
-      }
-      if (currentModelId === 'esportivo' && isBakeLike(m.map)) {
-        attachHueShift(m);
-        capaMaterialUuids.add(m.uuid);
-      }
-    }
-  });
-
+  // O mapeamento já foi feito internamente pelo VehicleCustomization.loadModel()
   await populateLogoRegions(modelId);
   wireImageUploadAndSelections();
   wireSwatchHandlers();
@@ -368,40 +302,11 @@ function wireSwatchHandlers() {
 }
 
 function applyColorChoice(groupKey, hex) {
-  if (!currentModel || !originalColorMap) return;
-  const hexLc = hex.toLowerCase();
-  const cfg = SWATCH_CONFIG[hexLc] || { sat: 1.0, val: 1.0 };
-
-  const baseHSL = { h: 0, s: 0, l: 0 };
-  STANDARD_INITIAL_COLOR.getHSL(baseHSL);
-  const target = new THREE.Color(hexLc);
-  const targetHSL = { h: 0, s: 0, l: 0 };
-  target.getHSL(targetHSL);
-  const deltaDeg = (targetHSL.h - baseHSL.h) * 360;
-
-  const uuids = groupKey === 'capa' ? capaMaterialUuids : linhaMaterialUuids;
-  const rotationMap = new Map();
-  const extraHue = (groupKey === 'capa' ? (cfg.hue || 0) : 0);
-  uuids.forEach((u) => rotationMap.set(u, deltaDeg + extraHue));
-  const targetLinear = target.clone();
-  if (targetLinear.convertSRGBToLinear) targetLinear.convertSRGBToLinear();
-  applyHueRotation(currentModel, rotationMap, originalColorMap, { sat: cfg.sat, val: cfg.val, mix: cfg.mix ?? 0.0, target: targetLinear });
-  applyDirectColor(uuids, target);
-  requestRender();
-}
-
-function applyDirectColor(uuids, color) {
-  currentModel.traverse((child) => {
-    if (!child.isMesh || !child.material) return;
-    const mats = Array.isArray(child.material) ? child.material : [child.material];
-    for (const m of mats) {
-      if (uuids.has(m.uuid) && m.color) {
-        if (m.userData && m.userData.hueShift) continue;
-        m.color.copy(color);
-        m.needsUpdate = true;
-      }
-    }
-  });
+  if (groupKey === 'capa') {
+    vehicleCustomization.setCapaColor(hex);
+  } else if (groupKey === 'linhas') {
+    vehicleCustomization.setLinhaColor(hex);
+  }
 }
 
 // ---------- UPLOAD E SELEÇÃO DE IMAGENS ----------
@@ -412,7 +317,7 @@ function wireImageUploadAndSelections() {
   if (!input || !list || !regions) return;
   if (input.dataset.wired === '1') {
     const refreshRegionOptions = () => {
-      const items = imagePool.list();
+      const items = vehicleCustomization.listLogoImages();
       regions.querySelectorAll('select.logo-assignment-select').forEach((sel) => {
         const prev = sel.value;
         sel.innerHTML = '';
@@ -436,7 +341,7 @@ function wireImageUploadAndSelections() {
 
   function refreshImageList() {
     list.innerHTML = '';
-    const items = imagePool.list();
+    const items = vehicleCustomization.listLogoImages();
     const status = document.getElementById('pngUploadStatus');
   if (!items.length) {
       if (status) status.textContent = 'Nenhum arquivo selecionado';
@@ -461,7 +366,7 @@ function wireImageUploadAndSelections() {
   }
 
   function refreshRegionOptions() {
-    const items = imagePool.list();
+    const items = vehicleCustomization.listLogoImages();
     regions.querySelectorAll('select.logo-assignment-select').forEach((sel) => {
       const prev = sel.value;
       sel.innerHTML = '';
@@ -481,7 +386,7 @@ function wireImageUploadAndSelections() {
 
   input.onchange = async () => {
     const files = Array.from(input.files || []);
-    for (const f of files) await imagePool.addFile(f);
+    await vehicleCustomization.addLogoImages(files);
     refreshImageList();
     refreshRegionOptions();
     input.value = '';
@@ -493,40 +398,15 @@ function wireImageUploadAndSelections() {
     if (!sel) return;
     const meshName = sel.dataset.meshName;
     const imageId = sel.value || null;
-    applyRegionAssignment(meshName, imageId).then(() => requestRender()).catch((err) => console.warn('Falha ao aplicar logo:', err));
+    vehicleCustomization.assignLogoToRegion(meshName, imageId)
+      .catch((err) => console.warn('Falha ao aplicar logo:', err));
   });
 
   refreshImageList();
   refreshRegionOptions();
 }
 
-async function applyRegionAssignment(meshName, imageId) {
-  if (!currentModel) return;
-  const targets = [];
-  currentModel.traverse((child) => {
-    if (child.isMesh && child.name === meshName) targets.push(child);
-  });
-  if (!targets.length) return;
-  if (!imageId) {
-    for (const mesh of targets) {
-      let material = mesh.material;
-      if (!clonedMeshes.has(mesh.uuid)) {
-        const cloned = material.clone();
-        mesh.material = cloned;
-        material = cloned;
-        clonedMeshes.add(mesh.uuid);
-      }
-      material.map = null;
-      material.needsUpdate = true;
-    }
-    return;
-  }
-  const item = imagePool.getById(imageId);
-  if (!item) return;
-  for (const mesh of targets) {
-    await assignTextureToMesh(mesh, item.url, { cloneMaterial: true, clonedMeshes });
-  }
-}
+// applyRegionAssignment agora é feito via vehicleCustomization.assignLogoToRegion()
 
 // ---------- HDR ----------
 async function populateHdrSelect() {
@@ -899,6 +779,7 @@ window.MZPrime = {
   scene,
   camera,
   renderer,
+  vehicleCustomization, // Nova API centralizada
   loadMapping: async (id) => (await import('./lib/mappings.js')).loadMappingForModelId(id),
   indexMapping: async (mapping) => (await import('./lib/mappings.js')).indexMapping(mapping),
   listMaterials: async (mapping) => (await import('./lib/mappings.js')).listMaterials(mapping),

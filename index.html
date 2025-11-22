@@ -16,64 +16,6 @@
   </head>
   <body>
     <div id="app">
-      <aside id="sidebar" aria-label="Painel de controles">
-        <h1>Controles</h1>
-        <hr />
-        <section class="control-group">
-          <div class="control">
-            <label>Modelo</label>
-            <div id="modelButtons" class="segmented-row model-grid"></div>
-          </div>
-        </section>
-
-        <section class="control-group">
-          <div class="control">
-            <label>Cor das Linhas</label>
-            <div id="lineColorSwatches" class="swatch-row trio">
-              <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto" title="Preto" style="--swatch:#090909"></button>
-              <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza" title="Cinza" style="--swatch:#615e60"></button>
-              <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo" title="Verde musgo" style="--swatch:#498551"></button>
-              <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal" title="Azul royal" style="--swatch:#2c41bd"></button>
-              <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--swatch:#001f5b"></button>
-              <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho" title="Vermelho" style="--swatch:#962d28"></button>
-            </div>
-          </div>
-          <div class="control">
-            <label>Cor da Capa</label>
-            <div id="capaColorSwatches" class="swatch-row trio">
-              <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto" title="Preto" style="--swatch:#090909"></button>
-              <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza" title="Cinza" style="--swatch:#615e60"></button>
-              <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo" title="Verde musgo" style="--swatch:#498551"></button>
-              <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal" title="Azul royal" style="--swatch:#2c41bd"></button>
-              <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--swatch:#001f5b"></button>
-              <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho" title="Vermelho" style="--swatch:#962d28"></button>
-            </div>
-          </div>
-        </section>
-
-        <section class="control-group">
-          <div class="control">
-            <label>Biblioteca de logos</label>
-            <input id="pngUpload" type="file" accept="image/png" multiple class="file-input-hidden" />
-            <div class="file-row">
-              <label class="btn" for="pngUpload">Escolher imagens</label>
-              <span id="pngUploadStatus" class="muted">Nenhum arquivo selecionado</span>
-            </div>
-            <div id="logoImageList" class="logo-image-list">
-              <p class="logo-image-empty">Nenhuma imagem carregada.</p>
-            </div>
-          </div>
-          <div class="control">
-            <label>Regiões de logo</label>
-            <div id="logoRegions" class="logo-assignment-grid">
-              <p class="logo-image-empty">Nenhuma região carregada.</p>
-            </div>
-          </div>
-        </section>
-
-        
-      </aside>
-
       <div id="viewport" aria-label="Área 3D"></div>
     </div>
 
