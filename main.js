@@ -51,6 +51,62 @@ if ('ResizeObserver' in window) {
 }
 resize();
 
+// ---------- PRESET CINEMATOGRÁFICO ----------
+const cinematic = {
+  active: false,
+  azimuth: 0,
+  basePolar: 0,
+  baseRadius: 0,
+  startTime: 0,
+
+  // Ultra-subtle, cinema-grade — barely perceptible, alive
+  orbitSpeed: 0.0028,   // rad/s → ~0.16°/s, full orbit ~37 min
+  breathAmp: 0.009,     // rad → ~0.52° polar oscillation
+  breathPeriod: 13000,  // ms
+  radiusAmp: 0.006,     // fraction of baseRadius
+  radiusPeriod: 8000,   // ms, phase-offset from breath
+
+  start() {
+    const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
+    this.azimuth    = Math.atan2(offset.x, offset.z);
+    this.baseRadius = offset.length();
+    this.basePolar  = Math.atan2(Math.sqrt(offset.x * offset.x + offset.z * offset.z), offset.y);
+    this.startTime  = performance.now();
+    this.active     = true;
+    controls.enabled = false;
+    startLoop();
+    document.getElementById('cinematicToggle')?.classList.add('active');
+  },
+
+  stop() {
+    if (!this.active) return;
+    this.active      = false;
+    controls.enabled = true;
+    controls.update();
+    document.getElementById('cinematicToggle')?.classList.remove('active');
+    setTimeout(() => { if (!cinematic.active) stopLoop(); }, 120);
+  },
+
+  update(dt, t) {
+    if (!this.active) return;
+    this.azimuth += this.orbitSpeed * (dt / 1000);
+    const elapsed = t - this.startTime;
+    const polar = THREE.MathUtils.clamp(
+      this.basePolar + this.breathAmp * Math.sin((2 * Math.PI * elapsed) / this.breathPeriod),
+      controls.minPolarAngle,
+      controls.maxPolarAngle
+    );
+    const r    = this.baseRadius * (1 + this.radiusAmp * Math.sin((2 * Math.PI * elapsed) / this.radiusPeriod));
+    const sinP = Math.sin(polar);
+    camera.position.set(
+      controls.target.x + r * sinP * Math.sin(this.azimuth),
+      controls.target.y + r * Math.cos(polar),
+      controls.target.z + r * sinP * Math.cos(this.azimuth)
+    );
+    camera.lookAt(controls.target);
+  },
+};
+
 // ---------- LOOP DE RENDERIZAÇÃO ----------
 let animating = false;
 let rafId = null;
@@ -73,7 +129,7 @@ function loop(t) {
   if (!animating) { rafId = null; return; }
   const dt = lastT ? (t - lastT) : 16.7; lastT = t;
   adaptPixelRatio(dt);
-  controls.update();
+  if (cinematic.active) { cinematic.update(dt, t); } else { controls.update(); }
   renderer.render(scene, camera);
   rafId = requestAnimationFrame(loop);
 }
@@ -103,6 +159,15 @@ function requestRender() {
 controls.addEventListener('change', () => { if (!animating) requestRender(); });
 controls.addEventListener('start', () => startLoop());
 controls.addEventListener('end', () => { if (!controls.autoRotate) setTimeout(() => stopLoop(), 120); });
+
+// Qualquer toque no viewport encerra o modo cinemático
+viewport.addEventListener('pointerdown', () => { if (cinematic.active) cinematic.stop(); });
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && cinematic.active) cinematic.stop();
+  if ((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.metaKey) {
+    cinematic.active ? cinematic.stop() : cinematic.start();
+  }
+});
 document.addEventListener('visibilitychange', () => {
   if (document.hidden) stopLoop();
   else { requestRender(); }
@@ -279,6 +344,13 @@ function wireModelSelect() {
 
 populateModels();
 wireModelSelect();
+
+function wireCinematicControls() {
+  const btn = document.getElementById('cinematicToggle');
+  if (!btn) return;
+  btn.addEventListener('click', () => { cinematic.active ? cinematic.stop() : cinematic.start(); });
+}
+wireCinematicControls();
 
 // ---------- REGIÕES DE LOGO ----------
 async function populateLogoRegions(modelId) {
@@ -834,7 +906,8 @@ window.MZPrime = {
   scene,
   camera,
   renderer,
-  vehicleCustomization, // Nova API centralizada
+  vehicleCustomization,
+  cinematic,
   loadMapping: async (id) => (await import('./lib/mappings.js')).loadMappingForModelId(id),
   indexMapping: async (mapping) => (await import('./lib/mappings.js')).indexMapping(mapping),
   listMaterials: async (mapping) => (await import('./lib/mappings.js')).listMaterials(mapping),
