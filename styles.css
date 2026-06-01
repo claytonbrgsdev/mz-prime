@@ -82,4 +82,21 @@ body {
 .control { margin-bottom: 14px; }
 .control > label { display: block; font-weight: 600; margin-bottom: 8px; }
 .slider-row { display: flex; gap: 8px; align-items: center; }
+
+.control select {
+  appearance: none;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--fg);
+  font-size: 14px;
+  cursor: pointer;
+}
+.control select:hover { border-color: #c7cdd4; }
+.control select:focus {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
   

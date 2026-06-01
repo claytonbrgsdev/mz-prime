@@ -162,6 +162,15 @@ async function selectModel(id, url) {
     currentModel = result.model;
     currentModelId = result.modelId;
     
+    // Atualiza o select no painel admin
+    const modelSelect = document.getElementById('modelSelect');
+    if (modelSelect) {
+      const targetValue = JSON.stringify({ id, url });
+      if (modelSelect.value !== targetValue) {
+        modelSelect.value = targetValue;
+      }
+    }
+    
     // Configuração de câmera e posicionamento
     camera.position.set(0, 0, 5);
     camera.near = 0.1;
@@ -195,7 +204,31 @@ async function populateModels() {
   try {
     const models = await vehicleCustomization.listAvailableModels();
     
-    // Se há botões no DOM, popula eles
+    // Popula o select no painel admin
+    const modelSelect = document.getElementById('modelSelect');
+    if (modelSelect) {
+      modelSelect.innerHTML = '';
+      for (const m of models) {
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify({ id: m.id, url: m.url });
+        opt.textContent = m.name || m.id || 'Modelo';
+        modelSelect.appendChild(opt);
+      }
+      
+      // Seleciona o modelo padrão (esportivo)
+      const preferred = models.find((m) => (m.id || '').toLowerCase() === 'esportivo');
+      const defaultModel = preferred || models[0];
+      if (defaultModel) {
+        const defaultOption = Array.from(modelSelect.options).find(
+          opt => JSON.parse(opt.value).id === defaultModel.id
+        );
+        if (defaultOption) {
+          modelSelect.value = defaultOption.value;
+        }
+      }
+    }
+    
+    // Se há botões no DOM (sidebar), popula eles também
     if (modelButtons) {
       modelButtons.innerHTML = '';
       for (const m of models) {
@@ -223,7 +256,29 @@ async function populateModels() {
     console.warn('Falha ao carregar manifest de modelos:', err);
   }
 }
+
+// Wire do select de modelos no painel admin
+function wireModelSelect() {
+  const modelSelect = document.getElementById('modelSelect');
+  if (!modelSelect) return;
+  
+  modelSelect.addEventListener('change', (e) => {
+    const value = e.target.value;
+    if (!value) return;
+    
+    try {
+      const { id, url } = JSON.parse(value);
+      if (id && url) {
+        void selectModel(id, url);
+      }
+    } catch (err) {
+      console.warn('Erro ao parsear seleção de modelo:', err);
+    }
+  });
+}
+
 populateModels();
+wireModelSelect();
 
 // ---------- REGIÕES DE LOGO ----------
 async function populateLogoRegions(modelId) {
