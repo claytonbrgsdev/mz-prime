@@ -883,51 +883,7 @@ async function loadScenario(url = currentScenarioUrl || DEFAULT_SCENARIO_URL) {
   }
 }
 
-async function switchScenario(id, url) {
-  // Atualiza botões
-  const btns = document.querySelectorAll('#scenarioButtons button');
-  btns.forEach(b => { const active = b.dataset.id === id; b.setAttribute('aria-pressed', String(active)); b.classList.toggle('active', active); });
-  // Carrega novo cenário
-  await loadScenario(url);
-  // Re-posiciona modelo atual no novo cenário
-  if (currentModel) {
-    await scaleModelToScenario(currentModel, currentModelId).catch(() => {});
-    await placeModelOnGround(currentModel).catch(() => {});
-    setControlsTargetToModel(currentModel);
-    setControlsDistanceLimitsForModel(currentModel);
-    setDefaultCameraOrbitForModel(currentModel);
-  }
-  requestRender();
-}
-
-async function populateScenarios() {
-  const container = document.getElementById('scenarioButtons');
-  if (!container) return;
-  try {
-    const res = await fetch('assets/cenarios/manifest.json');
-    if (!res.ok) return;
-    const scenarios = await res.json();
-    container.innerHTML = '';
-    let defaultScenario = scenarios.find(s => s.default) || scenarios[0];
-    for (const s of scenarios) {
-      const btn = document.createElement('button');
-      btn.className = 'seg-btn';
-      btn.textContent = s.name;
-      btn.dataset.id  = s.id;
-      btn.dataset.url = s.url;
-      btn.setAttribute('aria-pressed', 'false');
-      btn.addEventListener('click', () => switchScenario(s.id, s.url));
-      container.appendChild(btn);
-    }
-    // Seleciona e carrega o default
-    if (defaultScenario) switchScenario(defaultScenario.id, defaultScenario.url);
-  } catch (e) {
-    console.warn('Falha ao carregar cenários:', e);
-    loadScenario(); // fallback
-  }
-}
-
-populateScenarios();
+loadScenario();
 
 // ---------- ESCALA E POSICIONAMENTO DE MODELOS ----------
 async function scaleModelToScenario(model, modelId) {

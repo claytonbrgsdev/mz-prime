@@ -149,12 +149,6 @@ body {
   gap: 5px;
 }
 
-/* --- Scenario grid ------------------------------------------ */
-.scenario-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 5px;
-}
 
 .seg-btn {
   appearance: none;
