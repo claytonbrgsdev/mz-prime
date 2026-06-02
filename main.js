@@ -59,12 +59,12 @@ const cinematic = {
   baseRadius: 0,
   startTime: 0,
 
-  // Ultra-subtle, cinema-grade — barely perceptible, alive
-  orbitSpeed: 0.0028,   // rad/s → ~0.16°/s, full orbit ~37 min
-  breathAmp: 0.009,     // rad → ~0.52° polar oscillation
-  breathPeriod: 13000,  // ms
-  radiusAmp: 0.006,     // fraction of baseRadius
-  radiusPeriod: 8000,   // ms, phase-offset from breath
+  // Cinema-grade movement — subtle but clearly perceptible
+  orbitSpeed: 0.007,    // rad/s → ~0.40°/s, full orbit ~15 min
+  breathAmp: 0.012,     // rad → ~0.69° polar oscillation
+  breathPeriod: 11000,  // ms
+  radiusAmp: 0.008,     // fraction of baseRadius
+  radiusPeriod: 7000,   // ms, phase-offset from breath
 
   start() {
     const offset = new THREE.Vector3().subVectors(camera.position, controls.target);
@@ -393,7 +393,6 @@ async function populateLogoRegions(modelId) {
 
 // ---------- CONFIGURAÇÃO DE MODELO E UI ----------
 async function setupMappingAndUI(modelId) {
-  // O mapeamento já foi feito internamente pelo VehicleCustomization.loadModel()
   await populateLogoRegions(modelId);
   wireImageUploadAndSelections();
   wireSwatchHandlers();
@@ -403,6 +402,11 @@ async function setupMappingAndUI(modelId) {
   setControlsTargetToModel(currentModel);
   setControlsDistanceLimitsForModel(currentModel);
   setDefaultCameraOrbitForModel(currentModel);
+  // Aplica preset padrão apenas no primeiro load do esportivo
+  if (modelId === 'esportivo') applyDefaultPreset();
+  // Inicia câmera cinemática automaticamente
+  cinematic.stop();
+  cinematic.start();
 }
 
 // ---------- HANDLERS DE CORES ----------
@@ -437,100 +441,156 @@ function applyColorChoice(groupKey, hex) {
 }
 
 // ---------- UPLOAD E SELEÇÃO DE IMAGENS ----------
+// Funções de refresh expostas para uso pelo preset padrão
+function refreshLogoImageList() {
+  const list = document.getElementById('logoImageList');
+  const status = document.getElementById('pngUploadStatus');
+  if (!list) return;
+  list.innerHTML = '';
+  const items = vehicleCustomization.listLogoImages();
+  if (!items.length) {
+    if (status) status.textContent = 'Nenhum arquivo selecionado';
+    const p = document.createElement('p');
+    p.className = 'logo-image-empty';
+    p.textContent = 'Nenhuma imagem carregada.';
+    list.appendChild(p);
+    return;
+  }
+  if (status) status.textContent = `${items.length} logo(s) disponível(is)`;
+  for (const it of items) {
+    const img = document.createElement('img');
+    img.src = it.url;
+    img.alt = it.name;
+    img.style.width = '100%';
+    img.style.aspectRatio = '1/1';
+    img.style.objectFit = 'contain';
+    img.title = it.name;
+    list.appendChild(img);
+  }
+}
+
+function refreshRegionSelects(activeAssignments = {}) {
+  const regions = document.getElementById('logoRegions');
+  if (!regions) return;
+  const items = vehicleCustomization.listLogoImages();
+  regions.querySelectorAll('select.logo-assignment-select').forEach((sel) => {
+    const prev = activeAssignments[sel.dataset.meshName] ?? sel.value;
+    sel.innerHTML = '';
+    const optNone = document.createElement('option');
+    optNone.value = '';
+    optNone.textContent = '— Nenhuma —';
+    sel.appendChild(optNone);
+    for (const it of items) {
+      const opt = document.createElement('option');
+      opt.value = it.id;
+      opt.textContent = it.name;
+      sel.appendChild(opt);
+    }
+    sel.value = prev;
+  });
+}
+
+function setSwatchActive(rowId, hex) {
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.querySelectorAll('button[data-hex]').forEach((btn) => {
+    const active = btn.dataset.hex === hex;
+    btn.setAttribute('aria-pressed', String(active));
+    btn.classList.toggle('active', active);
+  });
+}
+
 function wireImageUploadAndSelections() {
   const input = document.getElementById('pngUpload');
-  const list = document.getElementById('logoImageList');
   const regions = document.getElementById('logoRegions');
-  if (!input || !list || !regions) return;
+  if (!input) return;
   if (input.dataset.wired === '1') {
-    const refreshRegionOptions = () => {
-      const items = vehicleCustomization.listLogoImages();
-      regions.querySelectorAll('select.logo-assignment-select').forEach((sel) => {
-        const prev = sel.value;
-        sel.innerHTML = '';
-        const optNone = document.createElement('option');
-        optNone.value = '';
-        optNone.textContent = '— Nenhuma —';
-        sel.appendChild(optNone);
-        for (const it of items) {
-          const opt = document.createElement('option');
-          opt.value = it.id;
-          opt.textContent = it.name;
-          sel.appendChild(opt);
-        }
-        sel.value = prev;
-      });
-    };
-    refreshRegionOptions();
+    refreshLogoImageList();
+    refreshRegionSelects();
     return;
   }
   input.dataset.wired = '1';
 
-  function refreshImageList() {
-    list.innerHTML = '';
-    const items = vehicleCustomization.listLogoImages();
-    const status = document.getElementById('pngUploadStatus');
-  if (!items.length) {
-      if (status) status.textContent = 'Nenhum arquivo selecionado';
-      const p = document.createElement('p');
-      p.className = 'logo-image-empty';
-      p.textContent = 'Nenhuma imagem carregada.';
-      list.appendChild(p);
-      return;
-    }
-    if (status) status.textContent = `${items.length} imagem(ns) carregada(s)`;
-    requestRender();
-    for (const it of items) {
-      const img = document.createElement('img');
-      img.src = it.url;
-      img.alt = it.name;
-      img.style.width = '100%';
-      img.style.aspectRatio = '1/1';
-      img.style.objectFit = 'contain';
-      img.title = it.name;
-      list.appendChild(img);
-    }
-  }
-
-  function refreshRegionOptions() {
-    const items = vehicleCustomization.listLogoImages();
-    regions.querySelectorAll('select.logo-assignment-select').forEach((sel) => {
-      const prev = sel.value;
-      sel.innerHTML = '';
-      const optNone = document.createElement('option');
-      optNone.value = '';
-      optNone.textContent = '— Nenhuma —';
-      sel.appendChild(optNone);
-      for (const it of items) {
-        const opt = document.createElement('option');
-        opt.value = it.id;
-        opt.textContent = it.name;
-        sel.appendChild(opt);
-      }
-      sel.value = prev;
-    });
-  }
-
   input.onchange = async () => {
     const files = Array.from(input.files || []);
     await vehicleCustomization.addLogoImages(files);
-    refreshImageList();
-    refreshRegionOptions();
+    refreshLogoImageList();
+    refreshRegionSelects();
     input.value = '';
     requestRender();
   };
 
-  regions.addEventListener('change', (e) => {
-    const sel = e.target.closest('select.logo-assignment-select');
-    if (!sel) return;
-    const meshName = sel.dataset.meshName;
-    const imageId = sel.value || null;
-    vehicleCustomization.assignLogoToRegion(meshName, imageId)
-      .catch((err) => console.warn('Falha ao aplicar logo:', err));
-  });
+  if (regions) {
+    regions.addEventListener('change', (e) => {
+      const sel = e.target.closest('select.logo-assignment-select');
+      if (!sel) return;
+      const meshName = sel.dataset.meshName;
+      const imageId = sel.value || null;
+      vehicleCustomization.assignLogoToRegion(meshName, imageId)
+        .catch((err) => console.warn('Falha ao aplicar logo:', err));
+    });
+  }
 
-  refreshImageList();
-  refreshRegionOptions();
+  refreshLogoImageList();
+  refreshRegionSelects();
+}
+
+// ---------- PRESET PADRÃO ----------
+let defaultPresetApplied = false;
+
+async function applyDefaultPreset() {
+  if (defaultPresetApplied) return;
+  defaultPresetApplied = true;
+
+  try {
+    // 1. Carrega logos do manifest
+    const res = await fetch('assets/logos/manifest.json');
+    if (!res.ok) return;
+    const logos = await res.json();
+
+    // 2. Adiciona logos ao pool por URL (sem precisar de File)
+    for (const logo of logos) {
+      vehicleCustomization.addLogoImageByUrl(logo.url, logo.name);
+    }
+
+    // 3. Atualiza UI de logos
+    refreshLogoImageList();
+
+    // 4. Aplica cores padrão
+    vehicleCustomization.setCapaColor('#001f5b');
+    vehicleCustomization.setLinhaColor('#962d28');
+    setSwatchActive('capaColorSwatches', '#001f5b');
+    setSwatchActive('lineColorSwatches', '#962d28');
+
+    // 5. Mapeia logos para regiões (logo diferente em cada região)
+    const pool = vehicleCustomization.listLogoImages();
+    const find = (keyword) => pool.find((l) => l.name.toLowerCase().includes(keyword)) ?? null;
+
+    const regionMap = {
+      FRENTE1:   find('ferrari'),
+      FRENTE2:   find('bmw'),
+      FRENTE3:   find('sparco'),
+      ESQUERDA:  find('michelin'),
+      DIREITA:   find('alpina'),
+      TRAS1:     find('prime capas'),
+      TRAS2:     find('bentley'),
+    };
+
+    const activeAssignments = {};
+    for (const [meshName, logo] of Object.entries(regionMap)) {
+      if (logo) {
+        await vehicleCustomization.assignLogoToRegion(meshName, logo.id);
+        activeAssignments[meshName] = logo.id;
+      }
+    }
+
+    // 6. Reflete nos selects das regiões
+    refreshRegionSelects(activeAssignments);
+
+    requestRender();
+  } catch (err) {
+    console.warn('Falha ao aplicar preset padrão:', err);
+  }
 }
 
 // applyRegionAssignment agora é feito via vehicleCustomization.assignLogoToRegion()

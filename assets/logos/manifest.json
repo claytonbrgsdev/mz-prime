@@ -1,0 +1,21 @@
+[
+  { "name": "Abarth",         "url": "assets/logos/abarth.png" },
+  { "name": "Alfa Romeo",     "url": "assets/logos/alfa-romeo.png" },
+  { "name": "Alpina",         "url": "assets/logos/alpina.png" },
+  { "name": "Bentley",        "url": "assets/logos/bentley.png" },
+  { "name": "Berlinale",      "url": "assets/logos/berlinale-preto.png" },
+  { "name": "BMW",            "url": "assets/logos/bmw.png" },
+  { "name": "Chevrolet",      "url": "assets/logos/chevrolet.png" },
+  { "name": "Ferrari",        "url": "assets/logos/ferrari.png" },
+  { "name": "Ford",           "url": "assets/logos/ford.png" },
+  { "name": "GAC",            "url": "assets/logos/gac.png" },
+  { "name": "Honda",          "url": "assets/logos/honda.png" },
+  { "name": "McQueen",        "url": "assets/logos/mcqueen.png" },
+  { "name": "Michelin",       "url": "assets/logos/michelin.png" },
+  { "name": "Mitsubishi",     "url": "assets/logos/mitsubishi.png" },
+  { "name": "Porsche",        "url": "assets/logos/porshe.png" },
+  { "name": "Prime Capas",    "url": "assets/logos/primecapaslogo.png" },
+  { "name": "Sparco",         "url": "assets/logos/sparco.png" },
+  { "name": "Subaru",         "url": "assets/logos/subaru.png" },
+  { "name": "Volkswagen",     "url": "assets/logos/volks.png" }
+]
