@@ -1,20 +1,21 @@
 /* ============================================================
-   MZ Prime — UI Stylesheet
+   Vitrine 3D — UI Stylesheet (dark theme)
    ============================================================ */
 
 /* --- Tokens ------------------------------------------------- */
 :root {
-  --bg:         #f8f8f8;
-  --surface:    #ffffff;
-  --fg:         #111111;
-  --fg-2:       #444444;
-  --muted:      #9a9a9a;
-  --border:     #e8e8e8;
-  --border-mid: #c8c8c8;
-  --accent:     #111111;
-  --accent-fg:  #ffffff;
+  --bg:         #0f0f0f;
+  --surface:    #181818;
+  --surface-2:  #222222;
+  --fg:         #ededed;
+  --fg-2:       #999999;
+  --muted:      #555555;
+  --border:     #2a2a2a;
+  --border-mid: #3e3e3e;
+  --accent:     #ededed;
+  --accent-fg:  #111111;
   --sidebar-w:  272px;
-  --r:          8px;
+  --r:          7px;
   --r-sm:       5px;
   --gap:        14px;
   --t:          0.13s ease;
@@ -35,53 +36,54 @@ body {
   position: fixed;
   inset: 0;
   z-index: 999;
-  background: #0b0b0b;
+  background: #0a0a0a;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.65s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #loading-screen.done {
   opacity: 0;
   pointer-events: none;
 }
-
 .ls-inner {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0;
 }
-
 .ls-brand {
-  margin: 0 0 28px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.4em;
+  margin: 0 0 6px;
+  font-size: 15px;
+  font-weight: 300;
+  letter-spacing: 0.22em;
   text-transform: uppercase;
-  color: rgba(255,255,255,0.3);
+  color: rgba(255,255,255,0.75);
 }
-
+.ls-subtitle {
+  margin: 0 0 32px;
+  font-size: 9px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.25);
+}
 .ls-track {
   width: 160px;
   height: 1px;
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.08);
   border-radius: 1px;
   overflow: hidden;
 }
-
 .ls-fill {
   height: 100%;
   width: 0%;
-  background: rgba(255,255,255,0.75);
+  background: rgba(255,255,255,0.6);
   transition: width 0.3s ease;
 }
-
 .ls-pct {
   margin: 12px 0 0;
-  font-size: 10px;
+  font-size: 9px;
   letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.15);
 }
 
 /* --- Layout ------------------------------------------------- */
@@ -99,7 +101,7 @@ body {
   overflow-x: hidden;
   background: var(--surface);
   border-right: 1px solid var(--border);
-  padding: 18px var(--gap) 48px;
+  padding: 20px var(--gap) 48px;
   scrollbar-width: thin;
   scrollbar-color: var(--border) transparent;
 }
@@ -108,14 +110,19 @@ body {
 #sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 .sidebar-brand {
-  margin: 0 0 14px;
-  font-size: 10px;
-  font-weight: 700;
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  color: var(--fg);
+}
+.sidebar-subtitle {
+  margin: 0 0 16px;
+  font-size: 9px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
 }
-
 .sidebar-rule {
   border: none;
   height: 1px;
@@ -125,13 +132,12 @@ body {
 
 /* --- Sidebar sections --------------------------------------- */
 .sb-section { margin-bottom: 22px; }
-
 .sb-label {
   display: block;
   margin-bottom: 8px;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
   color: var(--muted);
 }
@@ -143,15 +149,22 @@ body {
   gap: 5px;
 }
 
+/* --- Scenario grid ------------------------------------------ */
+.scenario-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 5px;
+}
+
 .seg-btn {
   appearance: none;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--fg-2);
   padding: 7px 6px;
   border-radius: var(--r-sm);
   cursor: pointer;
-  font-size: 11.5px;
+  font-size: 11px;
   font-weight: 600;
   text-align: center;
   transition: border-color var(--t), background var(--t), color var(--t);
@@ -164,41 +177,28 @@ body {
 .seg-btn.active          { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 
 /* --- Swatches ----------------------------------------------- */
-.swatch-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
+.swatch-row { display: flex; flex-wrap: wrap; gap: 7px; }
 
 .swatch-btn {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  border: 1.5px solid rgba(0,0,0,0.06);
-  background: var(--sw, #000);
+  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--sw, #fff);
   cursor: pointer;
   position: relative;
   flex-shrink: 0;
   transition: transform var(--t);
 }
 .swatch-btn:hover { transform: scale(1.15); }
-.swatch-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
+.swatch-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .swatch-btn.active,
 .swatch-btn[aria-pressed="true"] {
   box-shadow: 0 0 0 2px var(--surface), 0 0 0 3.5px var(--accent);
 }
 
 /* --- Logo library ------------------------------------------ */
-.file-row {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
+.file-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .file-input-hidden { position: absolute; left: -9999px; }
 
 .btn-upload {
@@ -206,7 +206,7 @@ body {
   padding: 5px 10px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--fg-2);
   font-size: 11px;
   font-weight: 600;
@@ -239,7 +239,8 @@ body {
   aspect-ratio: 1;
   object-fit: contain;
   border-radius: 3px;
-  opacity: 0.75;
+  opacity: 0.6;
+  filter: brightness(1.2);
   transition: opacity var(--t);
 }
 .logo-grid img:hover { opacity: 1; }
@@ -255,25 +256,22 @@ body {
 
 /* --- Logo assignment --------------------------------------- */
 .logo-assignment-grid { display: grid; gap: 7px; }
-
 .logo-assignment-item { display: grid; gap: 3px; }
-
 .logo-assignment-label {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   color: var(--muted);
 }
-
 .logo-assignment-select {
   appearance: none;
   padding: 6px 9px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--fg);
-  font-size: 11.5px;
+  font-size: 11px;
   width: 100%;
   cursor: pointer;
   transition: border-color var(--t);
@@ -282,10 +280,7 @@ body {
 .logo-assignment-select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
 /* --- Viewport ---------------------------------------------- */
-#viewport {
-  position: relative;
-  min-height: 0;
-}
+#viewport { position: relative; min-height: 0; }
 #viewport canvas {
   position: absolute;
   inset: 0;
@@ -300,29 +295,26 @@ body {
   right: 14px;
   bottom: 14px;
   z-index: 50;
-  width: 290px;
+  width: 280px;
 }
-
 .admin-shell {
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--r);
-  box-shadow: 0 6px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
 }
-
 .admin-shell > summary {
   cursor: pointer;
   list-style: none;
   padding: 10px 12px;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.18em;
+  letter-spacing: 0.2em;
   text-transform: uppercase;
   color: var(--muted);
   user-select: none;
 }
 .admin-shell > summary::-webkit-details-marker { display: none; }
-
 .admin-content {
   padding: 6px 12px 14px;
   max-height: 55vh;
@@ -333,20 +325,18 @@ body {
 
 .control-group { margin-bottom: 16px; }
 .control       { margin-bottom: 10px; }
-
 .control > label {
   display: block;
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.13em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--muted);
   margin-bottom: 5px;
 }
-
 .slider-row { display: flex; align-items: center; gap: 7px; }
 .slider-row input[type="range"] { flex: 1; accent-color: var(--accent); }
-.slider-row span { font-size: 10.5px; color: var(--muted); min-width: 28px; text-align: right; }
+.slider-row span { font-size: 10px; color: var(--muted); min-width: 28px; text-align: right; }
 
 .control select {
   appearance: none;
@@ -354,26 +344,26 @@ body {
   padding: 6px 9px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--fg);
-  font-size: 12px;
+  font-size: 11px;
   cursor: pointer;
   transition: border-color var(--t);
 }
 .control select:hover { border-color: var(--border-mid); }
 .control select:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
 
-/* --- Cinematic toggle -------------------------------------- */
+/* --- Cinematic button -------------------------------------- */
 .cinematic-btn {
   width: 100%;
   padding: 7px 10px;
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
-  background: var(--surface);
+  background: var(--surface-2);
   color: var(--fg-2);
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   text-align: left;
@@ -381,9 +371,4 @@ body {
 }
 .cinematic-btn:hover  { border-color: var(--border-mid); color: var(--fg); }
 .cinematic-btn.active { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
-
-.cinematic-hint {
-  margin: 5px 0 0;
-  font-size: 9px;
-  color: var(--muted);
-}
+.cinematic-hint { margin: 5px 0 0; font-size: 9px; color: var(--muted); }

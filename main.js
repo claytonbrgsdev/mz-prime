@@ -7,7 +7,7 @@ import { RGBELoader } from 'three/addons/loaders/RGBELoader.js';
 const viewport = document.getElementById('viewport');
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xffffff);
+scene.background = new THREE.Color(0x0f0f0f);
 
 const camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 camera.position.z = 5;
@@ -301,8 +301,9 @@ const CATEGORY_TARGET_RATIO = {
 // (SWATCH_CONFIG movido para customization.js)
 
 // ---------- CENÁRIO ----------
-const SCENARIO_URL = 'assets/cenarios/scifi_stage_gallery_baked_gltf/scene.gltf';
+const DEFAULT_SCENARIO_URL = 'assets/cenarios/scifi_stage_gallery_baked_gltf/scene.gltf';
 let scenarioRoot = null;
+let currentScenarioUrl = null;
 
 export async function loadModel(url) {
   // Função mantida para compatibilidade com API pública
@@ -863,29 +864,70 @@ function wireLightControls() {
 }
 wireLightControls();
 
-async function loadScenario() {
-  if (scenarioRoot) return scenarioRoot;
-  viewport.setAttribute('aria-busy', 'true');
-  viewport.dataset.busy = 'Carregando cenário…';
+async function loadScenario(url = currentScenarioUrl || DEFAULT_SCENARIO_URL) {
+  if (currentScenarioUrl === url && scenarioRoot) return scenarioRoot;
+  // Remove cenário anterior
+  if (scenarioRoot) { scene.remove(scenarioRoot); disposeObject(scenarioRoot); scenarioRoot = null; }
+  currentScenarioUrl = url;
   try {
-    const gltf = await loadGLB(SCENARIO_URL);
+    const gltf = await loadGLB(url);
     const root = gltf.scene || gltf.scenes?.[0];
     if (!root) throw new Error('Cenário GLTF sem cena válida');
     scenarioRoot = root;
-    scenarioRoot.visible = true;
     scene.add(scenarioRoot);
     requestRender();
     return scenarioRoot;
   } catch (e) {
     console.warn('Falha ao carregar cenário:', e);
     return null;
-  } finally {
-    viewport.removeAttribute('aria-busy');
-    delete viewport.dataset.busy;
   }
 }
 
-loadScenario();
+async function switchScenario(id, url) {
+  // Atualiza botões
+  const btns = document.querySelectorAll('#scenarioButtons button');
+  btns.forEach(b => { const active = b.dataset.id === id; b.setAttribute('aria-pressed', String(active)); b.classList.toggle('active', active); });
+  // Carrega novo cenário
+  await loadScenario(url);
+  // Re-posiciona modelo atual no novo cenário
+  if (currentModel) {
+    await scaleModelToScenario(currentModel, currentModelId).catch(() => {});
+    await placeModelOnGround(currentModel).catch(() => {});
+    setControlsTargetToModel(currentModel);
+    setControlsDistanceLimitsForModel(currentModel);
+    setDefaultCameraOrbitForModel(currentModel);
+  }
+  requestRender();
+}
+
+async function populateScenarios() {
+  const container = document.getElementById('scenarioButtons');
+  if (!container) return;
+  try {
+    const res = await fetch('assets/cenarios/manifest.json');
+    if (!res.ok) return;
+    const scenarios = await res.json();
+    container.innerHTML = '';
+    let defaultScenario = scenarios.find(s => s.default) || scenarios[0];
+    for (const s of scenarios) {
+      const btn = document.createElement('button');
+      btn.className = 'seg-btn';
+      btn.textContent = s.name;
+      btn.dataset.id  = s.id;
+      btn.dataset.url = s.url;
+      btn.setAttribute('aria-pressed', 'false');
+      btn.addEventListener('click', () => switchScenario(s.id, s.url));
+      container.appendChild(btn);
+    }
+    // Seleciona e carrega o default
+    if (defaultScenario) switchScenario(defaultScenario.id, defaultScenario.url);
+  } catch (e) {
+    console.warn('Falha ao carregar cenários:', e);
+    loadScenario(); // fallback
+  }
+}
+
+populateScenarios();
 
 // ---------- ESCALA E POSICIONAMENTO DE MODELOS ----------
 async function scaleModelToScenario(model, modelId) {

@@ -1,0 +1,8 @@
+[
+  { "id": "scifi-gallery",  "name": "Galeria",   "url": "assets/cenarios/scifi_stage_gallery_baked_gltf/scene.gltf", "default": true },
+  { "id": "showroom",       "name": "Showroom",   "url": "assets/cenarios/showroom.glb" },
+  { "id": "hangar",         "name": "Hangar",     "url": "assets/cenarios/hangar.glb" },
+  { "id": "garage",         "name": "Garagem",    "url": "assets/cenarios/garage.glb" },
+  { "id": "sci-fi-garage",  "name": "Sci-Fi",     "url": "assets/cenarios/sci-fi-garage.glb" },
+  { "id": "vr-gallery",     "name": "VR",         "url": "assets/cenarios/vr_gallery.glb" }
+]
