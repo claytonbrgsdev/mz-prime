@@ -10,7 +10,7 @@
   { "id": "caminhonete", "name": "Caminhonete", "url": "assets/modelos/caminhonete.glb" },
   { "id": "quadriciclo", "name": "Quadriciclo", "url": "assets/modelos/quadriciclo.glb" },
   { "id": "ford1929", "name": "Ford 1929", "url": "assets/modelos/ford1929.glb" }
-  ,{ "id": "motoG", "name": "Moto G", "url": "assets/modelos/motoG.glb" }
+  ,{ "id": "motoG", "name": "Moto", "url": "assets/modelos/motoG.glb" }
   ,{ "id": "sedan", "name": "Sedan", "url": "assets/modelos/sedan.glb" }
   
 ]

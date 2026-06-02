@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>mz-prime</title>
+    <title>MZ Prime</title>
     <link rel="stylesheet" href="styles.css" />
     <script type="importmap">
       {
@@ -15,98 +15,106 @@
     </script>
   </head>
   <body>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+      <div class="ls-inner">
+        <p class="ls-brand">MZ Prime</p>
+        <div class="ls-track"><div class="ls-fill" id="lsFill"></div></div>
+        <p class="ls-pct" id="lsPct">0%</p>
+      </div>
+    </div>
+
     <div id="app">
-      <aside id="sidebar" aria-label="Painel de controles">
-        <h1>Controles</h1>
-        <hr />
 
-        <section class="control-group">
-          <div class="control">
-            <label>Modelo</label>
-            <div id="modelButtons" class="segmented-row model-grid"></div>
+      <!-- Sidebar -->
+      <aside id="sidebar" aria-label="Controles">
+
+        <p class="sidebar-brand">Controles</p>
+        <hr class="sidebar-rule" />
+
+        <!-- Modelos -->
+        <section class="sb-section">
+          <span class="sb-label">Modelo</span>
+          <div id="modelButtons" class="model-grid"></div>
+        </section>
+
+        <!-- Cores -->
+        <section class="sb-section">
+          <span class="sb-label">Cor da capa</span>
+          <div id="capaColorSwatches" class="swatch-row">
+            <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto"        title="Preto"        style="--sw:#090909"></button>
+            <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza"        title="Cinza"        style="--sw:#615e60"></button>
+            <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo"  title="Verde musgo"  style="--sw:#498551"></button>
+            <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal"   title="Azul royal"   style="--sw:#2c41bd"></button>
+            <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--sw:#001f5b"></button>
+            <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho"     title="Vermelho"     style="--sw:#962d28"></button>
+          </div>
+
+          <span class="sb-label" style="margin-top:14px">Costura</span>
+          <div id="lineColorSwatches" class="swatch-row">
+            <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto"        title="Preto"        style="--sw:#090909"></button>
+            <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza"        title="Cinza"        style="--sw:#615e60"></button>
+            <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo"  title="Verde musgo"  style="--sw:#498551"></button>
+            <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal"   title="Azul royal"   style="--sw:#2c41bd"></button>
+            <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--sw:#001f5b"></button>
+            <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho"     title="Vermelho"     style="--sw:#962d28"></button>
           </div>
         </section>
 
-        <section class="control-group">
-          <div class="control">
-            <label>Cor das Linhas</label>
-            <div id="lineColorSwatches" class="swatch-row">
-              <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto"        title="Preto"        style="--swatch:#090909"></button>
-              <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza"        title="Cinza"        style="--swatch:#615e60"></button>
-              <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo"  title="Verde musgo"  style="--swatch:#498551"></button>
-              <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal"   title="Azul royal"   style="--swatch:#2c41bd"></button>
-              <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--swatch:#001f5b"></button>
-              <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho"     title="Vermelho"     style="--swatch:#962d28"></button>
-            </div>
+        <!-- Logos -->
+        <section class="sb-section">
+          <span class="sb-label">Logos</span>
+          <input id="pngUpload" type="file" accept="image/png,image/svg+xml" multiple class="file-input-hidden" />
+          <div class="file-row">
+            <label class="btn-upload" for="pngUpload">+ Adicionar</label>
+            <span id="pngUploadStatus" class="upload-status">Nenhum selecionado</span>
           </div>
-          <div class="control">
-            <label>Cor da Capa</label>
-            <div id="capaColorSwatches" class="swatch-row">
-              <button class="swatch-btn" data-hex="#090909" aria-pressed="false" aria-label="Preto"        title="Preto"        style="--swatch:#090909"></button>
-              <button class="swatch-btn" data-hex="#615e60" aria-pressed="false" aria-label="Cinza"        title="Cinza"        style="--swatch:#615e60"></button>
-              <button class="swatch-btn" data-hex="#498551" aria-pressed="false" aria-label="Verde musgo"  title="Verde musgo"  style="--swatch:#498551"></button>
-              <button class="swatch-btn" data-hex="#2c41bd" aria-pressed="false" aria-label="Azul royal"   title="Azul royal"   style="--swatch:#2c41bd"></button>
-              <button class="swatch-btn" data-hex="#001f5b" aria-pressed="false" aria-label="Azul marinho" title="Azul marinho" style="--swatch:#001f5b"></button>
-              <button class="swatch-btn" data-hex="#962d28" aria-pressed="false" aria-label="Vermelho"     title="Vermelho"     style="--swatch:#962d28"></button>
-            </div>
+          <div id="logoImageList" class="logo-grid">
+            <p class="logo-empty">Nenhuma imagem.</p>
           </div>
         </section>
 
-        <section class="control-group">
-          <div class="control">
-            <label>Biblioteca de logos</label>
-            <input id="pngUpload" type="file" accept="image/png" multiple class="file-input-hidden" />
-            <div class="file-row">
-              <label class="btn" for="pngUpload">Escolher imagens</label>
-              <span id="pngUploadStatus" class="muted">Nenhum arquivo selecionado</span>
-            </div>
-            <div id="logoImageList" class="logo-image-list">
-              <p class="logo-image-empty">Nenhuma imagem carregada.</p>
-            </div>
-          </div>
-          <div class="control">
-            <label>Regiões de logo</label>
-            <div id="logoRegions" class="logo-assignment-grid">
-              <p class="logo-image-empty">Nenhuma região carregada.</p>
-            </div>
+        <!-- Regiões -->
+        <section class="sb-section">
+          <span class="sb-label">Regiões de logo</span>
+          <div id="logoRegions" class="logo-assignment-grid">
+            <p class="logo-empty">Nenhuma região.</p>
           </div>
         </section>
+
       </aside>
 
       <div id="viewport" aria-label="Área 3D"></div>
     </div>
 
-    <!-- Admin floating panel -->
-    <div id="adminPanel" class="admin-panel" aria-label="Controles administrativos">
+    <!-- Admin panel -->
+    <div id="adminPanel" class="admin-panel" aria-label="Controles técnicos">
       <details class="admin-shell">
-        <summary>Controles Admin</summary>
+        <summary>Técnico</summary>
         <div class="admin-content">
+
           <section class="control-group">
             <div class="control">
               <label>Modelo</label>
               <select id="modelSelect"></select>
             </div>
-          </section>
-
-          <section class="control-group">
             <div class="control">
-              <label>Iluminação (HDR)</label>
+              <label>HDR</label>
               <select id="hdrSelect"></select>
             </div>
             <div class="control">
-              <label>
-                <input id="hdrBackgroundToggle" type="checkbox" /> Mostrar HDR como background
-              </label>
+              <label><input id="hdrBackgroundToggle" type="checkbox" /> HDR como background</label>
             </div>
             <div class="control">
-              <label for="envIntensity">Intensidade do environment</label>
+              <label>Intensidade env</label>
               <div class="slider-row">
                 <input id="envIntensity" type="range" min="0" max="3" value="1" step="0.1" />
                 <span id="envIntensityValue">1.0</span>
               </div>
             </div>
             <div class="control">
-              <label for="envExposure">Exposição</label>
+              <label>Exposição</label>
               <div class="slider-row">
                 <input id="envExposure" type="range" min="0.1" max="2.5" value="1.0" step="0.05" />
                 <span id="envExposureValue">1.0</span>
@@ -116,28 +124,24 @@
 
           <section class="control-group">
             <div class="control">
-              <label for="ambientIntensity">Luz ambiente (intensidade)</label>
+              <label>Luz ambiente</label>
               <div class="slider-row">
                 <input id="ambientIntensity" type="range" min="0" max="3" step="0.1" value="0.4" />
                 <span id="ambientIntensityValue">0.4</span>
               </div>
             </div>
             <div class="control">
-              <label>
-                <input id="ambientToggle" type="checkbox" checked /> Habilitar luz ambiente
-              </label>
+              <label><input id="ambientToggle" type="checkbox" checked /> Ativar</label>
             </div>
             <div class="control">
-              <label for="dirIntensity">Luz direcional (intensidade)</label>
+              <label>Luz direcional</label>
               <div class="slider-row">
                 <input id="dirIntensity" type="range" min="0" max="3" step="0.1" value="1.0" />
                 <span id="dirIntensityValue">1.0</span>
               </div>
             </div>
             <div class="control">
-              <label>
-                <input id="dirToggle" type="checkbox" checked /> Habilitar luz direcional
-              </label>
+              <label><input id="dirToggle" type="checkbox" checked /> Ativar</label>
             </div>
           </section>
 
@@ -145,9 +149,10 @@
             <div class="control">
               <label>Câmera</label>
               <button id="cinematicToggle" class="cinematic-btn">▶ Modo Cinemático</button>
-              <p class="cinematic-hint">Tecla C para ativar · Esc ou clique na cena para sair</p>
+              <p class="cinematic-hint">Tecla C · Esc ou clique na cena para sair</p>
             </div>
           </section>
+
         </div>
       </details>
     </div>

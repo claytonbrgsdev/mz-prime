@@ -51,6 +51,94 @@ if ('ResizeObserver' in window) {
 }
 resize();
 
+// ---------- LOADING SCREEN ----------
+const lsEl   = document.getElementById('loading-screen');
+const lsFill = document.getElementById('lsFill');
+const lsPct  = document.getElementById('lsPct');
+let _lsDone  = false;
+
+function lsUpdate(pct) {
+  if (_lsDone) return;
+  const p = Math.min(100, Math.max(0, pct));
+  if (lsFill) lsFill.style.width = `${p}%`;
+  if (lsPct)  lsPct.textContent  = `${Math.round(p)}%`;
+}
+
+function lsHide() {
+  if (_lsDone) return;
+  _lsDone = true;
+  lsUpdate(100);
+  setTimeout(() => lsEl?.classList.add('done'), 350);
+}
+
+// ---------- INTRO DE CÂMERA ----------
+const intro = {
+  active: false,
+  startTime: 0,
+  duration: 3800,  // ms — ease-out-quart, desacelera na chegada
+  startAz: 0, endAz: 0,
+  startPolar: 0, endPolar: 0,
+  startR: 0, endR: 0,
+
+  begin() {
+    // Câmera está na posição final após setDefaultCameraOrbitForModel
+    const off = new THREE.Vector3().subVectors(camera.position, controls.target);
+    this.endAz    = Math.atan2(off.x, off.z);
+    this.endPolar = Math.atan2(Math.sqrt(off.x * off.x + off.z * off.z), off.y);
+    this.endR     = off.length();
+
+    // Posição inicial: lado oposto (traseira), mais alto, mais afastado
+    this.startAz    = this.endAz + Math.PI;
+    this.startPolar = Math.max(0.18, this.endPolar - 0.50);
+    this.startR     = this.endR * 1.5;
+
+    this._moveCam(this.startAz, this.startPolar, this.startR);
+    this.startTime   = performance.now();
+    this.active      = true;
+    controls.enabled = false;
+    startLoop();
+  },
+
+  stop() {
+    if (!this.active) return;
+    this.active = false;
+    this._handoff();
+  },
+
+  update(dt, t) {
+    if (!this.active) return;
+    const raw  = Math.min((t - this.startTime) / this.duration, 1.0);
+    const ease = 1 - Math.pow(1 - raw, 4);           // ease-out quart
+    const az    = this.startAz + (this.endAz - this.startAz) * ease;
+    const polar = THREE.MathUtils.lerp(this.startPolar, this.endPolar, ease);
+    const r     = THREE.MathUtils.lerp(this.startR, this.endR, ease);
+    this._moveCam(az, polar, r);
+    if (raw >= 1.0) { this.active = false; this._handoff(); }
+  },
+
+  _moveCam(az, polar, r) {
+    const sinP = Math.sin(polar);
+    camera.position.set(
+      controls.target.x + r * sinP * Math.sin(az),
+      controls.target.y + r * Math.cos(polar),
+      controls.target.z + r * sinP * Math.cos(az)
+    );
+    camera.lookAt(controls.target);
+  },
+
+  _handoff() {
+    // Passa o estado de câmera actual para o cinemático sem salto
+    const off = new THREE.Vector3().subVectors(camera.position, controls.target);
+    cinematic.azimuth    = Math.atan2(off.x, off.z);
+    cinematic.basePolar  = Math.atan2(Math.sqrt(off.x * off.x + off.z * off.z), off.y);
+    cinematic.baseRadius = off.length();
+    cinematic.startTime  = performance.now();
+    cinematic.active     = true;
+    controls.enabled     = false;
+    document.getElementById('cinematicToggle')?.classList.add('active');
+  },
+};
+
 // ---------- PRESET CINEMATOGRÁFICO ----------
 const cinematic = {
   active: false,
@@ -129,7 +217,9 @@ function loop(t) {
   if (!animating) { rafId = null; return; }
   const dt = lastT ? (t - lastT) : 16.7; lastT = t;
   adaptPixelRatio(dt);
-  if (cinematic.active) { cinematic.update(dt, t); } else { controls.update(); }
+  if      (intro.active)     { intro.update(dt, t); }
+  else if (cinematic.active) { cinematic.update(dt, t); }
+  else                       { controls.update(); }
   renderer.render(scene, camera);
   rafId = requestAnimationFrame(loop);
 }
@@ -160,11 +250,18 @@ controls.addEventListener('change', () => { if (!animating) requestRender(); });
 controls.addEventListener('start', () => startLoop());
 controls.addEventListener('end', () => { if (!controls.autoRotate) setTimeout(() => stopLoop(), 120); });
 
-// Qualquer toque no viewport encerra o modo cinemático
-viewport.addEventListener('pointerdown', () => { if (cinematic.active) cinematic.stop(); });
+// Toque no viewport encerra intro ou cinemático
+viewport.addEventListener('pointerdown', () => {
+  if (intro.active) { intro.stop(); return; }
+  if (cinematic.active) cinematic.stop();
+});
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape' && cinematic.active) cinematic.stop();
+  if (e.key === 'Escape') {
+    if (intro.active) { intro.stop(); return; }
+    if (cinematic.active) cinematic.stop();
+  }
   if ((e.key === 'c' || e.key === 'C') && !e.ctrlKey && !e.metaKey) {
+    if (intro.active) { intro.stop(); return; }
     cinematic.active ? cinematic.stop() : cinematic.start();
   }
 });
@@ -216,38 +313,33 @@ export async function loadModel(url) {
 // ---------- SELEÇÃO DE MODELOS ----------
 const modelButtons = document.getElementById('modelButtons');
 async function selectModel(id, url) {
-  viewport.setAttribute('aria-busy', 'true');
-  viewport.dataset.busy = 'Carregando… 0%';
   try {
     const result = await vehicleCustomization.loadModel(id, url, (pct) => {
-      viewport.dataset.busy = pct == null ? 'Carregando…' : `Carregando… ${pct}%`;
+      lsUpdate(pct == null ? 30 : Math.min(75, pct * 0.75));
     });
     if (!result) return;
-    
-    currentModel = result.model;
+
+    currentModel   = result.model;
     currentModelId = result.modelId;
-    
-    // Atualiza o select no painel admin
+
     const modelSelect = document.getElementById('modelSelect');
     if (modelSelect) {
-      const targetValue = JSON.stringify({ id, url });
-      if (modelSelect.value !== targetValue) {
-        modelSelect.value = targetValue;
-      }
+      const v = JSON.stringify({ id, url });
+      if (modelSelect.value !== v) modelSelect.value = v;
     }
-    
-    // Configuração de câmera e posicionamento
+
     camera.position.set(0, 0, 5);
     camera.near = 0.1;
-    camera.far = 1000;
+    camera.far  = 1000;
     camera.updateProjectionMatrix();
-    
+
+    lsUpdate(80);
     await setupMappingAndUI(id);
+    lsUpdate(100);
+    lsHide();
   } catch (err) {
     console.warn('Falha ao carregar modelo:', err);
-  } finally {
-    viewport.removeAttribute('aria-busy');
-    delete viewport.dataset.busy;
+    lsHide();
   }
 }
 if (modelButtons) {
@@ -361,7 +453,7 @@ async function populateLogoRegions(modelId) {
     const regions = vehicleCustomization.getLogoRegions();
     if (!regions.length) {
       const p = document.createElement('p');
-      p.className = 'logo-image-empty';
+      p.className = 'logo-empty';
       p.textContent = 'Nenhuma região carregada.';
       container.appendChild(p);
       return;
@@ -385,7 +477,7 @@ async function populateLogoRegions(modelId) {
     }
   } catch (err) {
     const p = document.createElement('p');
-    p.className = 'logo-image-empty';
+    p.className = 'logo-empty';
     p.textContent = 'Falha ao carregar regiões.';
     container.appendChild(p);
   }
@@ -404,9 +496,9 @@ async function setupMappingAndUI(modelId) {
   setDefaultCameraOrbitForModel(currentModel);
   // Aplica preset padrão apenas no primeiro load do esportivo
   if (modelId === 'esportivo') applyDefaultPreset();
-  // Inicia câmera cinemática automaticamente
+  // Inicia intro de câmera automaticamente
   cinematic.stop();
-  cinematic.start();
+  intro.begin();
 }
 
 // ---------- HANDLERS DE CORES ----------
@@ -451,7 +543,7 @@ function refreshLogoImageList() {
   if (!items.length) {
     if (status) status.textContent = 'Nenhum arquivo selecionado';
     const p = document.createElement('p');
-    p.className = 'logo-image-empty';
+    p.className = 'logo-empty';
     p.textContent = 'Nenhuma imagem carregada.';
     list.appendChild(p);
     return;
